@@ -124,7 +124,7 @@
     .balance-card{
       position:relative;
       overflow:hidden;
-      padding:15px;
+      padding:10px;
       margin-bottom:16px;
       min-height:150px;
     }
@@ -156,11 +156,25 @@
       line-height:1.15;
       word-break:break-word;
     }
-    @media screen and (max-width:490px) {
+
+    @media screen and (min-width:380px) and (max-width:395px){
+      .balance-value{
+        font-size: 1.4rem !important;
+      }
+    }
+
+    @media screen and (min-width:395px) and (max-width:490px) {
       .balance-value{
         font-size: 1.5rem !important;
       }
     }
+
+    @media screen and (min-width:490px) and (max-width:512px) {
+      .balance-value{
+        font-size: 1.6rem !important;
+      }
+    }
+    
     .balance-sub{
       color:var(--muted);
       font-size:.9rem;
@@ -953,7 +967,14 @@
       line-height:1.5;
     }
 
-    @media screen and (max-width:430px) {
+    @media screen and (max-width:420px) {
+      .transaction-date{
+        font-size: 0.6rem;
+      }
+      
+    }
+
+    @media screen and (min-width:421px) and (max-width:430px) {
       .transaction-date{
         font-size: 0.7rem;
       }
@@ -965,10 +986,10 @@
     }
 
     .balance-hero{
-      display:grid;
+      display:flex;
       grid-template-columns:minmax(0,1.3fr) minmax(180px,.9fr);
       gap:18px;
-      /* align-items:center; */
+      justify-content: space-between;
     }
     .balance-copy{
       display:grid;
@@ -1616,7 +1637,6 @@
       display:flex;
       align-items:center;
       gap:8px;
-      flex-wrap:wrap;
       justify-content:flex-end;
       flex:1;
     }
@@ -1797,7 +1817,7 @@
 
 @media screen and (max-width:391px) {
   .weekly-chart-shell{
-            grid-template-columns:0px minmax(0,1fr) !important;
+            grid-template-columns:22px minmax(0,1fr) !important;
 
   }
 }
@@ -1822,7 +1842,7 @@
       }
 
       .weekly-y-axis{
-        font-size:.68rem;
+        font-size:.40rem;
         min-height:240px;
       }
 
