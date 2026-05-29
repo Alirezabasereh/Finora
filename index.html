@@ -124,7 +124,7 @@
     .balance-card{
       position:relative;
       overflow:hidden;
-      padding:22px;
+      padding:15px;
       margin-bottom:16px;
       min-height:150px;
     }
@@ -156,11 +156,23 @@
       line-height:1.15;
       word-break:break-word;
     }
+    @media screen and (max-width:490px) {
+      .balance-value{
+        font-size: 1.5rem !important;
+      }
+    }
     .balance-sub{
       color:var(--muted);
       font-size:.9rem;
       margin-top:8px;
+      
     }
+    @media screen and (max-width:490px) {
+          .balance-sub{
+                    font-size: .7rem;
+          }
+        
+      }
     .balance-chip{
       padding:10px 12px;
       border-radius:16px;
@@ -206,16 +218,35 @@
     }
 
     .stats-grid{
-      display:grid;
-      grid-template-columns:repeat(2, 1fr);
-      gap:12px;
+      display:flex;
+      flex-wrap: nowrap;
+      justify-content: center;
+      align-items: center;
       margin-bottom:16px;
+      gap: 16px;
+    }
+    @media screen and (max-width:435px) {
+      .stats-grid{
+              padding: 0px 7px;
+      }
+      
     }
     .stat-card{
-      padding:18px;
       display:flex;
       align-items:center;
-      gap:12px;
+      justify-content: center;
+      width: 50%;
+      height: 100px;
+    }
+
+    @media screen and (max-width:550px) {
+      .stat-card{
+        padding: 10px;
+      }
+    }
+
+    .stat-meta{
+      padding-right: 15px;
     }
     .stat-icon{
       width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-size:1.1rem;
@@ -223,7 +254,7 @@
     .income-card .stat-icon{background:rgba(24,230,166,.15);color:var(--good)}
     .expense-card .stat-icon{background:rgba(255,93,125,.15);color:var(--bad)}
     .stat-meta p{color:var(--muted);font-size:.9rem;margin-bottom:4px}
-    .stat-meta h2{font-size:1.35rem;line-height:1.2}
+    .stat-meta h2{font-size:1.55rem;line-height:1.2}
 
     .section-head{
       display:flex;
@@ -282,7 +313,7 @@
     .delete-btn{
       width:36px;height:36px;border-radius:12px;
       background:rgba(255,93,125,.12);color:var(--bad);
-      display:grid;place-items:center;
+      place-items:center;
     }
 
     .quick-actions{
@@ -338,6 +369,12 @@
       position:absolute;inset:0;display:grid;place-items:center;z-index:1;text-align:center;padding:20px;
     }
     .pie-center .big{font-size:2rem;font-weight:900;line-height:1}
+    @media screen and (max-width:480px) {
+      .pie-center .big{
+        font-size: 1.2rem;
+      }
+      
+    }
     .pie-center .small{font-size:.88rem;color:var(--muted);margin-top:8px}
     .legend{
       display:grid;
@@ -444,12 +481,21 @@
       gap:10px;
       align-items:flex-start;
     }
+
+    @media screen and (max-width:560px) {
+      .budget-top{
+        display: block !important;
+      }
+      
+    }
     .budget-left{
       display:flex;
       gap:12px;
-      align-items:center;
       min-width:0;
+      align-items:center;
     }
+
+  
     .cat-icon{
       width:46px;height:46px;border-radius:16px;display:grid;place-items:center;flex:0 0 auto;color:white;font-size:1rem;
     }
@@ -522,10 +568,16 @@
     .settings-list{display:grid;gap:12px}
     .setting-item{
       padding:16px;
-      display:flex;
       justify-content:space-between;
       align-items:center;
       gap:12px;
+      display:flex;
+    }
+    @media screen and (max-width:550px) {
+      .setting-item{
+        display: block !important;
+      }
+      
     }
     .setting-left{display:flex;gap:12px;align-items:center;min-width:0}
     .setting-icon{
@@ -587,10 +639,27 @@
       width:100%;
       max-width:560px;
       padding:18px;
-      border-radius:30px 30px 0 0;
+      border-radius:30px;
       animation:modalIn .28s ease;
-      max-height:88vh;
+      max-height:90vh;
       overflow:auto;
+      background-color: rgb(28 26 42 / 80%);
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: column;
+    }
+
+    .price-desc-enter{
+      display: flex;
+      justify-content: center;
+      align-content: center;
+      gap: 10px;
+    }
+    .price-enter{
+      width: 50%;
+    }
+    .desc-enter{
+      width: 50%;
     }
     @keyframes modalIn{
       from{transform:translateY(18px);opacity:.5}
@@ -619,9 +688,11 @@
     .field{margin-bottom:14px}
     .field label{display:block;margin-bottom:8px;color:var(--muted);font-size:.92rem}
     .category-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
+      display:flex;
+      flex-wrap: wrap;
       gap:10px;
+      justify-content: space-between;
+      align-items: center;
     }
     .category-btn{
       border:none;
@@ -633,7 +704,7 @@
       align-items:center;
       justify-content:center;
       gap:8px;
-      min-height:52px;
+      width: 150px;
       text-align:center;
       overflow:hidden;
     }
@@ -647,7 +718,7 @@
     }
     .save-btn{
       width:100%;
-      margin-top:2px;
+      margin-top:10px;
       padding:16px 18px;
     }
 
@@ -799,22 +870,392 @@
       overflow:hidden;
       text-overflow:ellipsis;
       max-width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:2px;
+    }
+    .calendar-day .day-amount-money,
+    .calendar-day .day-amount-unit{
+      display:block;
+      line-height:1.1;
     }
     .calendar-day .day-dots{margin-top:auto;align-items:center;}
+
+.day-currency{
+  display:block;
+  width:100%;
+  font-size:.56rem;
+  line-height:1.1;
+  margin-top:2px;
+  opacity:.82;
+}
+
     .calendar-day .day-empty-note{font-size:.68rem;color:var(--muted);opacity:.88;}
+
+    .filter-card{
+      padding:18px;
+    }
+    .filter-toggle{
+      width:100%;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      border:none;
+      background:transparent;
+      color:inherit;
+      text-align:right;
+      padding:0;
+    }
+    .filter-toggle-text{
+      display:grid;
+      gap:4px;
+      text-align:right;
+    }
+    .filter-toggle-text h3{
+      font-size:1.15rem;
+      margin:0;
+    }
+    .filter-toggle-text span{
+      color:var(--muted);
+      font-size:.9rem;
+    }
+    .filter-toggle i{
+      transition:transform .25s ease;
+      color:var(--muted);
+    }
+    .filter-toggle.active i{
+      transform:rotate(180deg);
+    }
+    .filter-panel{
+      display:grid;
+      gap:10px;
+      overflow:hidden;
+      max-height:0;
+      opacity:0;
+      transition:max-height .35s ease, opacity .25s ease, margin-top .25s ease;
+      margin-top:0;
+    }
+    .filter-panel.open{
+      max-height:720px;
+      opacity:1;
+      margin-top:14px;
+    }
+    .transaction-body{
+      display:grid;
+      gap:4px;
+      min-width:0;
+    }
+    .transaction-date{
+      font-size:.8rem;
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    @media screen and (max-width:430px) {
+      .transaction-date{
+        font-size: 0.7rem;
+      }
+      
+    }
+    .weekly-chart-area,
+    .weekly-bars{
+      direction:rtl;
+    }
+
+    .balance-hero{
+      display:grid;
+      grid-template-columns:minmax(0,1.3fr) minmax(180px,.9fr);
+      gap:18px;
+      /* align-items:center; */
+    }
+    .balance-copy{
+      display:grid;
+      gap:10px;
+      min-width:0;
+      align-content: space-between;
+    }
+    .balance-net{
+      width:max-content;
+      height: max-content;
+      padding:10px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid var(--border);
+      color:var(--muted);
+      font-size:.88rem;
+      font-weight:600;
+    }
+    .balance-visual{
+      display:grid;
+      justify-items:center;
+      gap:10px;
+    }
+    .balance-ring{
+      --usage:0%;
+      width:162px;
+      height:162px;
+      border-radius:50%;
+      background:conic-gradient(var(--accent2) 0 var(--usage), rgba(255,255,255,.10) var(--usage) 100%);
+      display:grid;
+      place-items:center;
+      position:relative;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), 0 14px 30px rgba(0,0,0,.18);
+    }
+    .balance-ring::after{
+      content:'';
+      position:absolute;
+      inset:14px;
+      border-radius:50%;
+      background:linear-gradient(180deg,var(--bg2),rgba(255,255,255,.02));
+      border:1px solid var(--border);
+    }
+    .balance-ring-inner{
+      position:relative;
+      z-index:1;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      gap:6px;
+      padding:10px;
+    }
+    .balance-ring-percent{
+      font-size:1.7rem;
+      font-weight:900;
+      line-height:1;
+    }
+    .balance-ring-caption{
+      color:var(--muted);
+      font-size:.82rem;
+    }
+    .balance-usage-text{
+      color:var(--muted);
+      font-size:.9rem;
+      text-align:center;
+      line-height:1.6;
+    }
+
+    @media screen and (max-width:432px) {
+          .balance-usage-text{
+            font-size: 0.70rem;
+          }
+    }
+    .balance-footer{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:10px;
+      margin-top:16px;
+    }
+    .balance-footer-item{
+      padding:14px;
+      border-radius:18px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.05);
+      display:grid;
+      gap:6px;
+    }
+    .balance-footer-item span{
+      color:var(--muted);
+      font-size:.84rem;
+    }
+    @media screen and (min-width:450px) {
+      .balance-footer-item span{
+        font-size: 1rem;
+      }
+      
+    }
+    .balance-footer-item strong{
+      font-size:1rem;
+      line-height:1.4;
+      word-break:break-word;
+    }
+
+    @media screen and (min-width:450px) {
+      .balance-footer-item strong{
+        font-size: 1.2rem;
+      }
+      
+    }
+    .balance-progress{
+      height:12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.05);
+      margin-top:14px;
+    }
+    .balance-progress > span{
+      display:block;
+      height:100%;
+      width:0%;
+      border-radius:inherit;
+      background:linear-gradient(90deg,var(--accent2),var(--accent1),var(--accent3));
+      transition:width .35s ease;
+    }
+
+    .home-breakdown-card{
+      padding:18px;
+      margin-bottom:16px;
+    }
+    .home-breakdown{
+      display:flex;
+      flex-direction:row;
+      gap:16px;
+      align-items:center;
+      direction:rtl;
+    }
+    .home-breakdown-chart{
+      flex:0 0 auto;
+      display:grid;
+      place-items:center;
+    }
+    .pie-chart-sm{
+      width:190px;
+      height:190px;
+    }
+    .home-breakdown-card .pie-center{
+      padding:12px;
+    }
+    .home-breakdown-card .pie-center .big{
+      font-size:clamp(.7rem, 2.6vw, 1rem);
+      line-height:1.05;
+      letter-spacing:-.04em;
+      word-break:break-word;
+    }
+    .home-breakdown-card .pie-center .small{
+      font-size:.76rem;
+      margin-top:5px;
+    }
+    .home-breakdown-legend{
+      flex:1;
+      display:grid;
+      gap:10px;
+      min-width:0;
+    }
+    .home-breakdown-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:2px 4px;
+    }
+    .home-breakdown-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+    .home-breakdown-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      flex:0 0 auto;
+      box-shadow:0 0 0 4px rgba(255,255,255,.03);
+    }
+    .home-breakdown-name{
+      font-weight:700;
+      min-width:0;
+    }
+    .home-breakdown-meta{
+      color:var(--muted);
+      font-size:.88rem;
+      white-space:nowrap;
+      flex:0 0 auto;
+    }
+    .home-full-button{
+      width:100%;
+      margin-top:14px;
+      padding:14px 16px;
+      border:none;
+      border-radius:18px;
+      background:linear-gradient(135deg,var(--accent1),var(--accent2));
+      color:#fff;
+      font-weight:800;
+      box-shadow:0 14px 32px rgba(106,92,255,.22);
+    }
+
+    .nav-action{
+      color:var(--text);
+      opacity:.62;
+    }
+    .nav-action i{font-size:1.1rem}
+    .nav-action span{font-weight:400}
+    .nav-action.active{color:var(--accent2);opacity:1;transform:translateY(-2px)}
+
+    .smart-insights-grid .smart-insight{
+      opacity:0;
+      transform:translateY(14px) scale(.985);
+      animation:smartInsightIn .42s cubic-bezier(.2,.8,.2,1) forwards;
+    }
+    @keyframes smartInsightIn{
+      from{opacity:0;transform:translateY(14px) scale(.985)}
+      to{opacity:1;transform:translateY(0) scale(1)}
+    }
+    .smart-insights-grid .smart-insight:nth-child(1){animation-delay:0ms}
+    .smart-insights-grid .smart-insight:nth-child(2){animation-delay:90ms}
+    .smart-insights-grid .smart-insight:nth-child(3){animation-delay:180ms}
+    .smart-insights-grid .smart-insight:nth-child(4){animation-delay:270ms}
+    .smart-insights-grid .smart-insight:nth-child(5){animation-delay:360ms}
+    .smart-insights-grid .smart-insight:nth-child(6){animation-delay:450ms}
+    .smart-insights-grid .smart-insight:nth-child(7){animation-delay:540ms}
+    .smart-insights-grid .smart-insight:nth-child(8){animation-delay:630ms}
+
+    .calendar-day .day-amount{
+      display:grid;
+      gap:2px;
+      white-space:normal;
+      line-height:1.15;
+      text-align:center;
+    }
+    .calendar-day .day-amount-money{
+      font-size:.72rem;
+      font-weight:700;
+      line-height:1.1;
+    }
+
+
+    @media screen and (max-width:431px) {
+      .calendar-day .day-amount-money{
+        font-size:.32rem !important;
+      }
+    }
+
+     @media screen and (min-width:431px) and (max-width:550px) {
+      .calendar-day .day-amount-money{
+        font-size:.52rem !important;
+      }
+    }
+    .calendar-day .day-amount-unit{
+      font-size:.56rem;
+      color:var(--muted);
+      line-height:1.1;
+    }
+
 
     @media (max-width: 480px){
       .app-shell{padding-inline:14px}
       .balance-value{font-size:1.85rem}
-      .stats-grid{grid-template-columns:1fr}
+      /* .stats-grid{grid-template-columns:1fr} */
       .quick-actions{grid-template-columns:1fr}
-      .category-grid{grid-template-columns:1fr}
-      .form-grid.two,.form-grid.three{grid-template-columns:1fr}
+      /* .category-grid{grid-template-columns:1fr} */
+      /* .form-grid.two,.form-grid.three{grid-template-columns:1fr} */
       .pie-chart{width:210px;height:210px}
       .bottom-nav{width:calc(100% - 16px)}
       .transaction-note{max-width:170px}
+      .home-breakdown{ gap:12px; }
+      .pie-chart-sm{ width:150px; height:150px; }
     }
     .budget-top-actions{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+    
+
+
+    @media screen and (max-width:560px) {
+      .budget-top-actions{
+        justify-content: space-between !important;
+      }
+      
+    }
     .budget-edit-toggle{
       width:40px;height:40px;
       padding:0;
@@ -829,8 +1270,7 @@
     .budget-edit-row[hidden]{display:none !important}
 
     .profile-actions{display:grid;gap:10px;margin-top:4px}
-    .profile-save-btn{width:max-content;min-width:148px;padding:12px 16px;border:none}
-    .upload-box{margin-top:14px}
+    .profile-save-btn{width:100%;min-width:148px;padding:12px 16px;border:none}
 
     .goal-card-complete{
       border-color:rgba(24,230,166,.35);
@@ -840,14 +1280,17 @@
     .goal-done-badge{
       display:inline-flex;
       align-items:center;
+      justify-content: center;
       gap:8px;
-      width:max-content;
+      width:100%;
+      margin: 0px auto;
       padding:10px 12px;
       border-radius:999px;
       font-size:.88rem;
       color:#18e6a6;
       background:rgba(24,230,166,.12);
       border:1px solid rgba(24,230,166,.22);
+      text-align: center;
     }
 
 
@@ -863,25 +1306,77 @@
 
     .monthly-report-card,
     .calendar-card{
-      padding:18px;
+      padding:20px;
       margin-bottom:12px;
+    }
+
+    .monthly-report-card{
+      position:relative;
+      overflow:hidden;
+    }
+    .monthly-report-card::before{
+      content:'';
+      position:absolute;
+      top:-40px;
+      right:-40px;
+      width:200px;
+      height:200px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(106,92,255,.28), transparent 65%);
+      filter:blur(28px);
+      pointer-events:none;
+      z-index:0;
+    }
+    .monthly-report-card::after{
+      content:'';
+      position:absolute;
+      bottom:-40px;
+      left:-40px;
+      width:180px;
+      height:180px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(0,210,255,.22), transparent 65%);
+      filter:blur(24px);
+      pointer-events:none;
+      z-index:0;
+    }
+    .monthly-report-card .section-head,
+    .monthly-report-card .monthly-report-grid,
+    .monthly-report-card .monthly-report-footer{
+      position:relative;
+      z-index:1;
     }
 
     .monthly-report-grid{
       display:grid;
       grid-template-columns:repeat(2, 1fr);
       gap:10px;
-      margin-top:6px;
+      margin-top:10px;
     }
 
     .monthly-report-box{
-      padding:14px;
+      padding:14px 16px;
       border-radius:18px;
       background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.07);
       display:grid;
       gap:6px;
+      position:relative;
+      overflow:hidden;
+      transition:.2s ease;
     }
+    .monthly-report-box::before{
+      content:'';
+      position:absolute;
+      inset:0 auto 0 0;
+      width:3px;
+      border-radius:0 3px 3px 0;
+      background:linear-gradient(180deg, var(--accent1), var(--accent2));
+      opacity:.6;
+    }
+    .monthly-report-box.cat-high::before{ background:linear-gradient(180deg,var(--bad),#ff8a65); }
+    .monthly-report-box.cat-low::before{ background:linear-gradient(180deg,var(--good),var(--accent2)); }
+    .monthly-report-box.cat-peak::before{ background:linear-gradient(180deg,var(--accent1),var(--accent3)); }
 
     .monthly-report-box span,
     .monthly-report-box small{
@@ -890,8 +1385,85 @@
     }
 
     .monthly-report-box strong{
-      font-size:1.2rem;
+      font-size:1.15rem;
       line-height:1.2;
+    }
+
+    .monthly-report-grid{
+      /* grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); */
+    }
+
+    .monthly-report-dual strong{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      font-size:1.05rem;
+    }
+
+    .monthly-report-dual strong span{
+      display:block;
+    }
+
+    .monthly-report-peak .peak-expense-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+      width:100%;
+      margin-top:2px;
+    }
+
+    .peak-expense-icon{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      background:rgba(106,92,255,.16);
+      border:1px solid rgba(255,255,255,.06);
+      font-size:1rem;
+    }
+
+    .peak-expense-meta{
+      min-width:0;
+      flex:1;
+      display:grid;
+      gap:2px;
+    }
+
+    .peak-expense-title{
+      font-weight:800;
+      line-height:1.3;
+    }
+
+    .peak-expense-note{
+      color:var(--muted);
+      font-size:.86rem;
+      line-height:1.5;
+      word-break:break-word;
+    }
+
+    .peak-expense-amount{
+      white-space:nowrap;
+      font-weight:900;
+      font-size:.96rem;
+    }
+
+    .monthly-report-box.cat-high strong,
+    .monthly-report-box.cat-low strong,
+    .monthly-report-box.cat-peak strong{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+      font-size:1rem;
+    }
+    .monthly-report-box.cat-high strong small,
+    .monthly-report-box.cat-low strong small,
+    .monthly-report-box.cat-peak strong small{
+      font-size:.82rem;
+      font-weight:400;
+      color:var(--muted);
     }
 
     .monthly-report-footer{
@@ -981,25 +1553,54 @@
       gap:10px;
     }
     .smart-insight{
-      padding:14px;
-      border-radius:18px;
+      padding:16px;
+      border-radius:20px;
       background:rgba(255,255,255,.05);
-      border:1px solid rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.07);
       display:flex;
-      gap:12px;
+      gap:14px;
       align-items:flex-start;
+      position:relative;
+      overflow:hidden;
+      transition:.22s ease;
     }
+    .smart-insight::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      opacity:0;
+      background:linear-gradient(135deg, rgba(106,92,255,.06), transparent 60%);
+      transition:.22s ease;
+    }
+    .smart-insight:hover::before{ opacity:1; }
+    .smart-insight.good{ border-color:rgba(24,230,166,.18); background:rgba(24,230,166,.05); }
+    .smart-insight.warn{ border-color:rgba(255,184,77,.18); background:rgba(255,184,77,.04); }
+    .smart-insight.bad{ border-color:rgba(255,93,125,.18); background:rgba(255,93,125,.04); }
     .smart-insight .si-icon{
-      width:42px;height:42px;border-radius:14px;
+      width:44px;height:44px;border-radius:16px;
       display:grid;place-items:center;flex:0 0 auto;
       background:rgba(106,92,255,.18);
       color:var(--accent2);
+      font-size:1.05rem;
+      box-shadow:0 6px 18px rgba(106,92,255,.18);
     }
-    .smart-insight.good .si-icon{background:rgba(24,230,166,.16);color:var(--good)}
-    .smart-insight.warn .si-icon{background:rgba(255,184,77,.16);color:var(--warn)}
-    .smart-insight.bad .si-icon{background:rgba(255,93,125,.16);color:var(--bad)}
-    .smart-insight h4{margin-bottom:4px}
-    .smart-insight p{color:var(--muted);font-size:.92rem;line-height:1.7}
+    .smart-insight.good .si-icon{
+      background:rgba(24,230,166,.18);
+      color:var(--good);
+      box-shadow:0 6px 18px rgba(24,230,166,.14);
+    }
+    .smart-insight.warn .si-icon{
+      background:rgba(255,184,77,.18);
+      color:var(--warn);
+      box-shadow:0 6px 18px rgba(255,184,77,.14);
+    }
+    .smart-insight.bad .si-icon{
+      background:rgba(255,93,125,.18);
+      color:var(--bad);
+      box-shadow:0 6px 18px rgba(255,93,125,.14);
+    }
+    .smart-insight h4{margin-bottom:5px;font-size:1rem}
+    .smart-insight p{color:var(--muted);font-size:.91rem;line-height:1.75}
 
   
     /* =========================
@@ -1160,6 +1761,7 @@
     .modal-overlay.active{
       opacity:1;
       pointer-events:auto;
+      background-color: rgb(28 26 42 / 80%);
     }
 
     .reset-modal{
@@ -1193,7 +1795,19 @@
       flex:1;
     }
 
+@media screen and (max-width:360px) {
+  .weekly-chart-shell{
+            grid-template-columns:0px minmax(0,1fr) !important;
 
+  }
+}
+
+@media screen and (min-width:412px) and (max-width:430px){
+  .weekly-chart-shell{
+            grid-template-columns:35px minmax(0,1fr) !important;
+
+  }
+}
 @media (max-width: 520px){
       .weekly-chart-shell{
         grid-template-columns:48px minmax(0,1fr);
@@ -1248,7 +1862,288 @@
       }
     }
 
-  </style>
+  
+    .full-width-action{
+      width:100%;
+      display:block;
+    }
+
+    .profile-page-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .profile-page-head > div{
+      min-width:0;
+    }
+    .profile-theme-btn{
+      width:52px;
+      height:52px;
+      flex:0 0 auto;
+    }
+
+    .transaction-modal{
+      scrollbar-width:none;
+      -ms-overflow-style:none;
+    }
+    .transaction-modal::-webkit-scrollbar{
+      width:0;
+      height:0;
+      display:none;
+    }
+
+    
+    .monthly-report-emphasis span,
+    .monthly-report-emphasis small{
+      color:var(--muted) !important;
+      font-weight:400 !important;
+    }
+    .monthly-report-emphasis strong,
+    .monthly-report-box.cat-high strong,
+    .monthly-report-box.cat-low strong,
+    .monthly-report-box.cat-peak strong,
+    .monthly-report-dual strong{
+      color:var(--text) !important;
+      font-weight:800 !important;
+    }
+    .monthly-report-emphasis strong > span,
+    .monthly-report-emphasis strong > small,
+    .monthly-report-box.cat-high strong > span,
+    .monthly-report-box.cat-high strong > small,
+    .monthly-report-box.cat-low strong > span,
+    .monthly-report-box.cat-low strong > small,
+    .monthly-report-box.cat-peak strong > span,
+    .monthly-report-box.cat-peak strong > small{
+      color:var(--text) !important;
+      font-weight:800 !important;
+    }
+    .monthly-report-emphasis strong,
+    .monthly-report-box.cat-high strong,
+    .monthly-report-box.cat-low strong,
+    .monthly-report-box.cat-peak strong{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+    .monthly-report-dual strong{
+      font-size:1.02rem;
+      gap:6px;
+    }
+    .monthly-report-dual strong span{
+      color:var(--text) !important;
+      font-weight:800 !important;
+    }
+    #reportPeakExpenseText,
+    #reportHighestCat,
+    #reportLowestCat{
+      display:flex;
+      flex-direction:column;
+      gap:3px;
+    }
+    #reportPeakExpenseText span,
+    #reportPeakExpenseText small,
+    #reportHighestCat span,
+    #reportHighestCat small,
+    #reportLowestCat span,
+    #reportLowestCat small{
+      color:var(--text) !important;
+      font-weight:800 !important;
+    }
+    
+
+    
+    .ai-card.ai-placeholder{
+      padding:20px;
+      background:
+        radial-gradient(circle at top right, rgba(106,92,255,.16), transparent 34%),
+        radial-gradient(circle at left center, rgba(0,210,255,.10), transparent 30%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05)),
+        var(--card);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 22px 60px rgba(0,0,0,.16);
+      overflow:hidden;
+    }
+    .smart-insights-grid{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      width:100%;
+    }
+    .smart-insight{
+      border-radius:22px;
+      padding:16px;
+      min-height:124px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      width:100%;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border:1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow:0 12px 26px rgba(0,0,0,.10);
+      position:relative;
+      overflow:hidden;
+      transition:.22s ease;
+    }
+    .smart-insight::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      opacity:0;
+      background:linear-gradient(135deg, rgba(106,92,255,.10), transparent 55%);
+      transition:.22s ease;
+    }
+    .smart-insight:hover{
+      transform:translateY(-2px);
+      border-color:rgba(255,255,255,.12);
+    }
+    .smart-insight:hover::before{ opacity:1; }
+    .smart-insight.good{ border-color:rgba(24,230,166,.18); background:linear-gradient(180deg, rgba(24,230,166,.08), rgba(255,255,255,.04)); }
+    .smart-insight.warn{ border-color:rgba(255,184,77,.20); background:linear-gradient(180deg, rgba(255,184,77,.08), rgba(255,255,255,.04)); }
+    .smart-insight.bad{ border-color:rgba(255,93,125,.18); background:linear-gradient(180deg, rgba(255,93,125,.08), rgba(255,255,255,.04)); }
+    .smart-insight .si-icon{
+      width:50px;
+      height:50px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      background:rgba(106,92,255,.18);
+      color:var(--accent2);
+      font-size:1.05rem;
+      box-shadow:0 8px 20px rgba(106,92,255,.16);
+    }
+    .smart-insight.good .si-icon{
+      background:rgba(24,230,166,.18);
+      color:var(--good);
+      box-shadow:0 8px 20px rgba(24,230,166,.14);
+    }
+    .smart-insight.warn .si-icon{
+      background:rgba(255,184,77,.18);
+      color:var(--warn);
+      box-shadow:0 8px 20px rgba(255,184,77,.14);
+    }
+    .smart-insight.bad .si-icon{
+      background:rgba(255,93,125,.18);
+      color:var(--bad);
+      box-shadow:0 8px 20px rgba(255,93,125,.14);
+    }
+    .smart-insight .si-body{min-width:0}
+    .smart-insight h4{margin-bottom:6px;font-size:1rem}
+    .smart-insight p{color:var(--muted);font-size:.91rem;line-height:1.8}
+
+    .insight-card{
+      padding:20px;
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      border-radius:24px;
+      background:
+        radial-gradient(circle at top right, rgba(106,92,255,.14), transparent 32%),
+        linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:0 18px 44px rgba(0,0,0,.12);
+      overflow:hidden;
+    }
+    .insight-card .insight-icon{
+      width:60px;
+      height:60px;
+      border-radius:20px;
+      background:linear-gradient(135deg,var(--accent1),var(--accent3));
+      box-shadow:0 14px 30px rgba(106,92,255,.24);
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      color:#fff;
+    }
+    .insight-card .insight-body{
+      min-width:0;
+      display:grid;
+      gap:2px;
+      flex:1;
+    }
+    .insight-card .insight-body h3{
+      font-size:1.12rem;
+      margin-bottom:4px;
+    }
+    .insight-card .insight-body p{
+      color:var(--muted);
+      line-height:1.9;
+      font-size:.95rem;
+    }
+    .insight-card .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:14px !important;
+    }
+    .insight-card .chip{
+      width: 100%;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:999px;
+      padding:10px 12px;
+      box-shadow:0 10px 22px rgba(0,0,0,.08);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .coming-soon{
+      text-align:center;
+      padding:28px 18px 18px;
+      color:var(--muted);
+      border-radius:24px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .coming-soon i{font-size:2.4rem;color:var(--accent1);margin-bottom:10px}
+    .weekly-summary{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:10px;
+    }
+    .weekly-summary-item{
+      padding:14px 16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.06);
+      display:grid;
+      gap:6px;
+      min-width:0;
+    }
+    .weekly-summary-item span{
+      color:var(--muted);
+      font-size:.86rem;
+    }
+    .weekly-summary-item strong{
+      color:var(--text);
+      font-size:1.02rem;
+      font-weight:800;
+      line-height:1.3;
+    }
+
+    @media (max-width: 700px){
+      .profile-page-head{
+        align-items:flex-start;
+      }
+      .weekly-summary{
+        /* grid-template-columns:1fr; */
+      }
+    }
+    
+      .profile-page-head{
+        align-items:flex-start;
+      }
+
+      option{
+        color: rgb(22, 22, 22);
+      }
+    
+</style>
 </head>
 <body>
   <div class="app-shell">
@@ -1262,31 +2157,40 @@
             <div class="balance-sub">مدیریت خرج، درآمد، بودجه و هدف‌های مالی</div>
           </div>
         </div>
-        <button class="glass icon-btn" type="button" id="themeQuickToggle" aria-label="toggle theme">
-          <i class="fa-solid fa-moon"></i>
+        <button class="glass icon-btn" type="button" id="homeProfileBtn" aria-label="open profile">
+          <i class="fa-solid fa-user"></i>
         </button>
       </header>
 
       <section class="glass balance-card section">
-        <div class="balance-top">
-          <div>
+        <div class="balance-hero">
+          <div class="balance-copy">
             <div class="balance-label">موجودی کل</div>
             <div class="balance-value" id="balanceAmount">۰ تومان</div>
             <div class="balance-sub">موجودی اولیه + درآمدها - هزینه‌ها</div>
+            <div class="balance-net" id="netFlowChip">خالص: ۰</div>
           </div>
-          <div class="balance-chip" id="netFlowChip">خالص: ۰</div>
+          <div class="balance-visual">
+            <div class="balance-ring" id="budgetUsageRing" style="--usage:0%">
+              <div class="balance-ring-inner">
+                <div class="balance-ring-percent" id="budgetUsagePercent">۰٪</div>
+                <div class="balance-ring-caption">مصرف بودجه</div>
+              </div>
+            </div>
+            <div class="balance-usage-text" id="budgetUsageText">۰ از ۰ تومان</div>
+          </div>
         </div>
-      </section>
-
-      <section class="glass initial-balance-card section">
-        <div>
-          <h3>موجودی اولیه</h3>
-          <p>اگر از قبل مبلغی داری، اینجا وارد کن. از همین مقدار، جمع درآمدها و هزینه‌ها محاسبه می‌شود.</p>
+        <div class="balance-footer">
+          <div class="balance-footer-item">
+            <span>بودجه قابل مصرف</span>
+            <strong id="budgetBaseAmount">۰</strong>
+          </div>
+          <div class="balance-footer-item">
+            <span>هزینه ثبت‌شده</span>
+            <strong id="budgetSpentAmount">۰</strong>
+          </div>
         </div>
-        <div class="initial-balance-row">
-          <input class="input" type="number" id="initialBalanceInput" placeholder="مثلاً 5000000">
-          <button class="save-btn secondary" type="button" id="saveInitialBalanceBtn">ثبت</button>
-        </div>
+        <div class="balance-progress"><span id="budgetUsageBar"></span></div>
       </section>
 
       <section class="stats-grid section">
@@ -1306,29 +2210,46 @@
         </div>
       </section>
 
-      <section class="glass card section">
+      <section class="glass card section home-breakdown-card">
         <div class="section-head">
-          <h3>دسته‌بندی‌های فعال</h3>
-          <span>برای ثبت تراکنش و بودجه</span>
+          <h3>خلاصه تقسیم هزینه‌ها</h3>
+          
+                  <span>نمودار و درصد</span>
         </div>
-        <div class="chips" id="categoryChips"></div>
+        <div class="home-breakdown">
+          <div class="home-breakdown-legend" id="homeExpenseLegend"></div>
+          <div class="home-breakdown-chart">
+            <div class="pie-chart pie-chart-sm" id="homeExpensePieChart">
+              <div class="pie-center">
+                <div>
+                  <div class="big" id="homeExpensePieTotal">۰</div>
+                  <div class="small">مجموع هزینه</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="home-full-button" type="button" data-nav-target="analytics">مشاهده گزارش کامل</button>
       </section>
 
-      <section class="glass card section">
-        <div class="section-head">
-          <h3>جستجو و فیلتر</h3>
-          <span>سرچ، دسته، بازه زمانی و نوع تراکنش</span>
-        </div>
-        <div class="filter-panel">
+      <section class="glass card section filter-card">
+        <button class="filter-toggle" id="filterToggle" type="button" aria-expanded="false">
+          <div class="filter-toggle-text">
+            <h3>جستجو و فیلتر</h3>
+            <span>سرچ، دسته، بازه زمانی و نوع تراکنش</span>
+          </div>
+          <i class="fa-solid fa-chevron-down"></i>
+        </button>
+        <div class="filter-panel" id="filterPanel">
           <input class="input" type="search" id="transactionSearchInput" placeholder="جستجو در تراکنش‌ها">
           <div class="form-grid two">
             <select class="select" id="transactionTypeFilter">
-              <option value="all">همه نوع‌ها</option>
+              <option value="all">همه تراکنش‌ها</option>
               <option value="expense">فقط هزینه‌ها</option>
               <option value="income">فقط درآمدها</option>
             </select>
             <select class="select" id="transactionCategoryFilter">
-              <option value="all">همه دسته‌ها</option>
+              <option value="all">همه دسته‌بندی‌ها</option>
             </select>
           </div>
           <div class="form-grid two" style="margin-top:10px">
@@ -1341,8 +2262,8 @@
               <input class="input" type="date" id="transactionToDate">
             </div>
           </div>
-          <div style="margin-top:10px;display:flex;justify-content:flex-end">
-            <button class="save-cat-btn secondary" type="button" id="clearFiltersBtn">پاک‌سازی فیلترها</button>
+          <div style="margin-top:10px">
+            <button class="save-cat-btn secondary full-width-action" type="button" id="clearFiltersBtn">پاک‌سازی فیلترها</button>
           </div>
         </div>
       </section>
@@ -1350,34 +2271,23 @@
       <section class="glass card section">
         <div class="section-head">
           <h3>تراکنش‌ها</h3>
-          <span>قابل حذف و مرتب‌سازی بر اساس زمان</span>
+          
         </div>
         <div class="transactions-list" id="transactionsContainer"></div>
-      </section>
-
-      <section class="quick-actions section">
-        <button class="glass action-btn" type="button" id="quickAddTransaction">
-          <i class="fa-solid fa-plus"></i>
-          ثبت تراکنش
-        </button>
-        <button class="glass action-btn" type="button" data-nav-target="budget">
-          <i class="fa-solid fa-wallet"></i>
-          بودجه‌ها
-        </button>
       </section>
     </section>
 
     <section class="page" id="analyticsPage" data-page="analytics">
       <div class="page-title-wrap">
         <h2 class="page-title">تحلیل مالی</h2>
-        <p>بر اساس تراکنش‌های واقعی</p>
+        <p>بر اساس تراکنش‌های ثبت شده</p>
       </div>
 
       <div class="analytics-grid">
         <section class="glass card pie-card">
           <div class="section-head">
             <h3>تقسیم هزینه‌ها</h3>
-            <span>فقط هزینه‌ها</span>
+            <span>درصد و مبلغ</span>
           </div>
           <div class="pie-wrap">
             <div class="pie-chart" id="pieChart">
@@ -1438,9 +2348,39 @@
               <small>افزایش/کاهش</small>
             </div>
             <div class="monthly-report-box">
-              <span>میانگین روزانه</span>
+              <span>میانگین روزانه تا امروز</span>
               <strong id="reportDailyAvg">۰</strong>
-              <small>هزینه روزانه</small>
+              <small>بر اساس روزهای سپری‌شده</small>
+            </div>
+            <div class="monthly-report-box">
+              <span>میانگین روزهای خرج‌دار</span>
+              <strong id="reportExpenseDaysAvg">۰</strong>
+              <small>فقط روزهای دارای هزینه</small>
+            </div>
+            <div class="monthly-report-box">
+              <span>میانگین ۳۰ روز اخیر</span>
+              <strong id="reportRolling30Avg">۰</strong>
+              <small>هزینه روزانه در بازه‌ی ۳۰ روزه</small>
+            </div>
+            <div class="monthly-report-box monthly-report-dual monthly-report-emphasis">
+              <span>میانگین تفکیکی درآمد / هزینه</span>
+              <strong id="reportIncomeExpenseAvg"></strong>
+              <small>روزانه در ماه جاری</small>
+            </div>
+            <div class="monthly-report-box cat-peak monthly-report-emphasis">
+              <span>پرخرج‌ترین هزینه</span>
+              <strong id="reportPeakExpenseText">—</strong>
+              <small>بزرگ‌ترین تراکنش این ماه</small>
+            </div>
+            <div class="monthly-report-box cat-high monthly-report-emphasis">
+              <span>پرهزینه‌ترین دسته‌بندی</span>
+              <strong id="reportHighestCat">—</strong>
+              <small>بیشترین هزینه این ماه</small>
+            </div>
+            <div class="monthly-report-box cat-low monthly-report-emphasis">
+              <span>کم‌هزینه‌ترین دسته‌بندی</span>
+              <strong id="reportLowestCat">—</strong>
+              <small>کمترین هزینه این ماه</small>
             </div>
           </div>
           <div class="monthly-report-footer">
@@ -1471,14 +2411,13 @@
           <div class="calendar-grid" id="calendarGrid"></div>
         </section>
 
-        <section class="glass insight-card" id="analyticsInsight"></section>
       </div>
     </section>
 
     <section class="page" id="budgetPage" data-page="budget">
       <div class="page-title-wrap">
         <h2 class="page-title">بودجه و هدف‌ها</h2>
-        <p>دسته‌های جدید بساز، سقف تعیین کن، هدف مالی اضافه کن</p>
+        <p>دسته‌های جدید بساز، سقف تعیین کن و هدف مالی اضافه کن</p>
       </div>
 
       <div class="budget-page-grid">
@@ -1488,8 +2427,8 @@
             <span>برای تراکنش، بودجه و نمودار</span>
           </div>
           <div class="form-grid two">
-            <input class="input" type="text" id="newCategoryName" placeholder="نام دسته (مثلاً خودرو)">
-            <input class="input" type="text" id="newCategoryEmoji" placeholder="آیکن/ایموجی (مثلاً 🚗)" maxlength="4">
+            <input class="input" type="text" id="newCategoryName" placeholder="نام دسته‌بندی">
+            <input class="input" type="text" id="newCategoryEmoji" placeholder="آیکون / ایموجی" maxlength="4">
           </div>
           <div class="form-grid three" style="margin-top:10px">
             <select class="select" id="newCategoryType">
@@ -1500,7 +2439,7 @@
             <input class="input" type="color" id="newCategoryColor" value="#6a5cff" style="padding:6px;height:50px">
           </div>
           <div style="margin-top:10px">
-            <button class="save-cat-btn" type="button" id="addCategoryBtn">افزودن دسته</button>
+            <button class="save-cat-btn full-width-action" type="button" id="addCategoryBtn">افزودن دسته</button>
           </div>
           <div class="chips" id="categoryList"></div>
         </section>
@@ -1508,7 +2447,7 @@
         <section class="glass management-card">
           <div class="section-head">
             <h3>بودجه‌های ماهانه</h3>
-            <span>بر اساس مصرف واقعی</span>
+            <span>بر اساس تراکنش‌های ثبت شده</span>
           </div>
           <div class="budget-list" id="budgetContainer"></div>
         </section>
@@ -1523,7 +2462,7 @@
             <input class="input" type="number" id="newGoalTarget" placeholder="مبلغ هدف">
           </div>
           <div style="margin-top:10px">
-            <button class="save-goal-btn secondary" type="button" id="addGoalBtn">افزودن هدف</button>
+            <button class="save-goal-btn secondary full-width-action" type="button" id="addGoalBtn">افزودن هدف</button>
           </div>
           <div class="goals-grid" id="goalsContainer" style="margin-top:14px"></div>
         </section>
@@ -1533,14 +2472,15 @@
     <section class="page" id="aiPage" data-page="ai">
       <div class="page-title-wrap">
         <h2 class="page-title">دستیار مالی AI</h2>
-        <p>فعلاً در فاز بعدی تکمیل می‌شود</p>
+        <p>نتیجه‌های تحلیلی و پیشنهادهای هوشمند</p>
       </div>
       <section class="glass ai-card ai-placeholder">
         <div class="section-head">
           <h3>Smart Insights</h3>
-          <span>تحلیل‌های هوشمند بر پایه داده‌های واقعی</span>
+          <span>تحلیل هوشمند بر پایه داده‌های شما</span>
         </div>
         <div class="smart-insights-grid" id="aiSmartInsights"></div>
+        <section class="glass insight-card" id="analyticsInsight" style="margin-top:16px"></section>
         <div class="coming-soon" style="margin-top:14px">
           <i class="fa-solid fa-brain"></i>
           <h3>فعلاً فقط تحلیل‌های خودکار</h3>
@@ -1550,21 +2490,25 @@
     </section>
 
     <section class="page" id="profilePage" data-page="profile">
-      <div class="page-title-wrap">
-        <h2 class="page-title">پروفایل و تنظیمات</h2>
-        <p>تنظیمات پایه و ابزارهای تعمیر</p>
+      <div class="page-title-wrap profile-page-head">
+        <div>
+          <h2 class="page-title">پروفایل کاربر</h2>
+          <p>ویرایش اطلاعات و تنظیمات برنامه</p>
+        </div>
+        <button class="glass icon-btn profile-theme-btn" type="button" id="profileThemeToggle" aria-label="toggle theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
       </div>
 
       <section class="glass profile-card">
         <div class="profile-edit-card">
           <div class="profile-main-row">
-            <img class="profile-avatar-preview" id="profileAvatarPreview" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27256%27%20height%3D%27256%27%20viewBox%3D%270%200%20256%20256%27%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%270%25%27%20stop-color%3D%27%236a5cff%27/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%27100%25%27%20stop-color%3D%27%2300d2ff%27/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Crect%20width%3D%27256%27%20height%3D%27256%27%20rx%3D%27128%27%20fill%3D%27url%28%23g%29%27/%3E%0A%20%20%3Ccircle%20cx%3D%27128%27%20cy%3D%2798%27%20r%3D%2740%27%20fill%3D%27rgba%28255%2C255%2C255%2C.92%29%27/%3E%0A%20%20%3Cpath%20d%3D%27M58%20220c14-38%2043-58%2070-58s56%2020%2070%2058%27%20fill%3D%27rgba%28255%2C255%2C255%2C.92%29%27/%3E%0A%3C/svg%3E" alt="profile avatar">
+            <img class="profile-avatar-preview" id="profileAvatarPreview" src="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%27256%27%20height%3D%27256%27%20viewBox%3D%270%200%20256%20256%27%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%271%27%20y2%3D%271%27%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%270%25%27%20stop-color%3D%27%236a5cff%27/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%27100%25%27%20stop-color%3D%27%2300d2ff%27/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%20%20%3Crect%20width%3D%27256%27%20height%3D%27256%27%20rx%3D%27128%27%20fill%3D%27url%28%23g%29%27/%3E%0A%20%20%3Ccircle%20cx%3D%27128%27%20cy%3D%2798%27%20r%3D%2740%27%20fill%3D%27rgba%28255%2C255%2C255%2C.92%29%27/%3E%0A%20%20%3Cpath%20d%3D%27M58%20220c14-38%2043-58%2070-58s56%2020%2070%2058%27%20fill%3D%27rgba%28255%2C255%2C255%2C.92%29%27/%3E%3C/svg%3E" alt="profile avatar">
             <div class="profile-meta">
               <label class="field-label" for="profileNameInput">نام کاربر</label>
               <input class="input" type="text" id="profileNameInput" placeholder="کاربر" maxlength="30">
               <div class="profile-actions">
                 <button class="save-btn profile-save-btn" type="button" id="profileSaveBtn">ذخیره نام</button>
-                <p class="muted profile-hint">نام و تصویر پروفایل به صورت خودکار ذخیره می‌شوند.</p>
               </div>
             </div>
           </div>
@@ -1576,21 +2520,19 @@
           </label>
         </div>
 
+        <section class="glass initial-balance-card section" style="margin-top:16px">
+          <div>
+            <h3>موجودی اولیه</h3>
+            <p>اگر از قبل مبلغی داری، اینجا وارد کن. از همین مقدار، جمع درآمدها و هزینه‌ها محاسبه می‌شود.</p>
+          </div>
+          <div class="initial-balance-row">
+            <input class="input" type="number" id="initialBalanceInput" placeholder="مثلاً ۵٬۰۰۰٬۰۰۰">
+            <button class="save-btn secondary" type="button" id="saveInitialBalanceBtn">ثبت</button>
+          </div>
+        </section>
+
         <div class="settings-list" style="margin-top:16px">
           <div class="glass setting-item">
-            <div class="setting-left">
-              <div class="setting-icon"><i class="fa-solid fa-moon"></i></div>
-              <div class="setting-text">
-                <h4>Dark Mode</h4>
-                <p>حالت روشن/تاریک</p>
-              </div>
-            </div>
-            <label class="switch">
-              <input type="checkbox" id="themeToggle">
-              <span class="slider"></span>
-            </label>
-          </div>
-<div class="glass setting-item">
             <div class="setting-left">
               <div class="setting-icon"><i class="fa-solid fa-rotate-left"></i></div>
               <div class="setting-text">
@@ -1602,12 +2544,9 @@
           </div>
         </div>
       </section>
+    </section></section>
     </section>
   </div>
-
-  <button class="fab" type="button" id="openModalBtn" aria-label="add transaction">
-    <i class="fa-solid fa-plus"></i>
-  </button>
 
   <nav class="bottom-nav">
     <button class="nav-item active" type="button" data-nav="home">
@@ -1616,14 +2555,14 @@
     <button class="nav-item" type="button" data-nav="analytics">
       <i class="fa-solid fa-chart-pie"></i><span>تحلیل</span>
     </button>
+    <button class="nav-item nav-action" type="button" id="openModalBtn" data-open-modal aria-label="add transaction">
+      <i class="fa-solid fa-plus"></i><span>ثبت</span>
+    </button>
     <button class="nav-item" type="button" data-nav="budget">
       <i class="fa-solid fa-wallet"></i><span>بودجه</span>
     </button>
     <button class="nav-item" type="button" data-nav="ai">
       <i class="fa-solid fa-brain"></i><span>AI</span>
-    </button>
-    <button class="nav-item" type="button" data-nav="profile">
-      <i class="fa-solid fa-user"></i><span>پروفایل</span>
     </button>
   </nav>
 
@@ -1632,7 +2571,7 @@
       <div class="modal-head">
         <div>
           <div class="modal-title">ثبت تراکنش</div>
-          <div class="muted" style="font-size:.9rem;margin-top:4px">مبلغ‌ها عددی محاسبه می‌شوند، نه رشته‌ای</div>
+          
         </div>
         <button class="close-btn" type="button" id="closeModalBtn"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -1642,20 +2581,26 @@
         <button class="type-btn" type="button" data-type="income">درآمد</button>
       </div>
 
-      <div class="field">
-        <label for="transactionAmount">مبلغ</label>
-        <input class="input" type="number" id="transactionAmount" placeholder="مثلاً 250000">
+      <div class="price-desc-enter">
+
+        <div class="field price-enter">
+        <label for="transactionAmount">مبلغ (تومان)</label>
+        <input class="input" type="number" id="transactionAmount">
+         </div>
+
+                <div class="field desc-enter">
+               <label for="transactionNote">توضیحات</label>
+               <textarea style="resize: none;" class="input" id="transactionNote" rows="1"></textarea>
+                </div>
       </div>
+      
 
       <div class="field">
         <label>دسته‌بندی</label>
         <div class="category-grid" id="transactionCategoryGrid"></div>
       </div>
 
-      <div class="field">
-        <label for="transactionNote">توضیحات</label>
-        <textarea class="input" id="transactionNote" placeholder="توضیح کوتاه..." rows="4"></textarea>
-      </div>
+      
 
       <button class="save-btn" type="button" id="saveTransactionBtn">ذخیره تراکنش</button>
     </div>
@@ -1704,6 +2649,68 @@
         return String(value).replace(/[0-9]/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
       }
 
+      /* ─── تبدیل تاریخ میلادی به شمسی ─── */
+      /* ─── تبدیل میلادی ← شمسی (الگوریتم صحیح، epoch=1600) ─── */
+      function toJalali(gy, gm, gd) {
+        var g_y = gy - 1600, g_m = gm - 1, g_d = gd - 1;
+        var gMonthDays = [31,28,31,30,31,30,31,31,30,31,30,31];
+        var g_d_no = 365*g_y + Math.floor((g_y+3)/4) - Math.floor((g_y+99)/100) + Math.floor((g_y+399)/400);
+        for (var i = 0; i < g_m; i++) g_d_no += gMonthDays[i];
+        if (g_m > 1 && ((gy%4===0 && gy%100!==0) || gy%400===0)) g_d_no++;
+        g_d_no += g_d;
+        var j_d_no = g_d_no - 79;
+        var j_np = Math.floor(j_d_no / 12053); j_d_no %= 12053;
+        var jy = 979 + 33*j_np + 4*Math.floor(j_d_no/1461);
+        j_d_no %= 1461;
+        if (j_d_no >= 366) { jy += Math.floor((j_d_no-1)/365); j_d_no = (j_d_no-1)%365; }
+        var jMonthDays = [31,31,31,31,31,31,30,30,30,30,30];
+        var jm = 0;
+        for (jm = 0; jm < 11 && j_d_no >= jMonthDays[jm]; jm++) j_d_no -= jMonthDays[jm];
+        return [jy, jm+1, j_d_no+1];
+      }
+
+      /* ─── تبدیل شمسی ← میلادی (الگوریتم صحیح، epoch=1600) ─── */
+      function fromJalali(jy, jm, jd) {
+        var j_y = jy - 979, j_m = jm - 1, j_d = jd - 1;
+        var jMonthDays = [31,31,31,31,31,31,30,30,30,30,30,29];
+        var j_d_no = 365*j_y + Math.floor(j_y/33)*8 + Math.floor((j_y%33+3)/4);
+        for (var i = 0; i < j_m; i++) j_d_no += jMonthDays[i];
+        j_d_no += j_d;
+        var g_d_no = j_d_no + 79;
+        var gy = 1600 + 400*Math.floor(g_d_no/146097); g_d_no %= 146097;
+        var leap = true;
+        if (g_d_no >= 36525) {
+          g_d_no--;
+          gy += 100*Math.floor(g_d_no/36524); g_d_no %= 36524;
+          if (g_d_no >= 365) g_d_no++; else leap = false;
+        }
+        gy += 4*Math.floor(g_d_no/1461); g_d_no %= 1461;
+        if (g_d_no >= 366) {
+          leap = false; g_d_no--;
+          gy += Math.floor(g_d_no/365); g_d_no = g_d_no%365;
+        }
+        var gMonthDays = [31,leap?29:28,31,30,31,30,31,31,30,31,30,31];
+        var gm = 0;
+        for (gm = 0; gm < 12; gm++) {
+          if (g_d_no < gMonthDays[gm]) break;
+          g_d_no -= gMonthDays[gm];
+        }
+        return [gy, gm+1, g_d_no+1];
+      }
+
+      function isJalaliLeapYear(jy) {
+        var a = jy - (jy > 474 ? 474 : 473);
+        return ((a%2820 + 474 + 38)*682)%2816 < 682;
+      }
+
+      function jalaliDaysInMonth(jy, jm) {
+        if (jm <= 6) return 31;
+        if (jm <= 11) return 30;
+        return isJalaliLeapYear(jy) ? 30 : 29;
+      }
+
+      const jalaliMonthNames = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+
 
 const presetAvatars = [
         `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='256' height='256' viewBox='0 0 256 256'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0%' stop-color='#6a5cff'/><stop offset='100%' stop-color='#00d2ff'/></linearGradient></defs><rect width='256' height='256' rx='128' fill='url(#g)'/><circle cx='128' cy='102' r='42' fill='rgba(255,255,255,.9)'/><path d='M58 220c13-39 43-58 70-58s57 19 70 58' fill='rgba(255,255,255,.9)'/></svg>`)}`,
@@ -1740,11 +2747,11 @@ const presetAvatars = [
 
       const els = {
         pages: document.querySelectorAll('.page'),
-        navItems: document.querySelectorAll('.nav-item'),
+        navItems: document.querySelectorAll('.nav-item:not(.nav-action)'),
         themeToggle: document.getElementById('themeToggle'),
-        themeQuickToggle: document.getElementById('themeQuickToggle'),
+        homeProfileBtn: document.getElementById('homeProfileBtn'),
+        profileThemeToggle: document.getElementById('profileThemeToggle'),
         openModalBtn: document.getElementById('openModalBtn'),
-        quickAddTransaction: document.getElementById('quickAddTransaction'),
         closeModalBtn: document.getElementById('closeModalBtn'),
         transactionModal: document.getElementById('transactionModal'),
         saveTransactionBtn: document.getElementById('saveTransactionBtn'),
@@ -1753,6 +2760,15 @@ const presetAvatars = [
         transactionCategoryGrid: document.getElementById('transactionCategoryGrid'),
         typeButtons: document.querySelectorAll('.type-btn'),
         balanceAmount: document.getElementById('balanceAmount'),
+        budgetUsageRing: document.getElementById('budgetUsageRing'),
+        budgetUsagePercent: document.getElementById('budgetUsagePercent'),
+        budgetUsageText: document.getElementById('budgetUsageText'),
+        budgetBaseAmount: document.getElementById('budgetBaseAmount'),
+        budgetSpentAmount: document.getElementById('budgetSpentAmount'),
+        budgetUsageBar: document.getElementById('budgetUsageBar'),
+        homeExpensePieChart: document.getElementById('homeExpensePieChart'),
+        homeExpensePieTotal: document.getElementById('homeExpensePieTotal'),
+        homeExpenseLegend: document.getElementById('homeExpenseLegend'),
         incomeAmount: document.getElementById('incomeAmount'),
         expenseAmount: document.getElementById('expenseAmount'),
         netFlowChip: document.getElementById('netFlowChip'),
@@ -1765,6 +2781,8 @@ const presetAvatars = [
         transactionFromDate: document.getElementById('transactionFromDate'),
         transactionToDate: document.getElementById('transactionToDate'),
         clearFiltersBtn: document.getElementById('clearFiltersBtn'),
+        filterToggle: document.getElementById('filterToggle'),
+        filterPanel: document.getElementById('filterPanel'),
         categoryChips: document.getElementById('categoryChips'),
         analyticsPieChart: document.getElementById('pieChart'),
         pieTotal: document.getElementById('pieTotal'),
@@ -1775,6 +2793,12 @@ const presetAvatars = [
         reportPrevExpense: document.getElementById('reportPrevExpense'),
         reportDelta: document.getElementById('reportDelta'),
         reportDailyAvg: document.getElementById('reportDailyAvg'),
+        reportExpenseDaysAvg: document.getElementById('reportExpenseDaysAvg'),
+        reportRolling30Avg: document.getElementById('reportRolling30Avg'),
+        reportIncomeExpenseAvg: document.getElementById('reportIncomeExpenseAvg'),
+        reportPeakExpenseText: document.getElementById('reportPeakExpenseText'),
+        reportHighestCat: document.getElementById('reportHighestCat'),
+        reportLowestCat: document.getElementById('reportLowestCat'),
         reportComparisonText: document.getElementById('reportComparisonText'),
         reportTopCategoryText: document.getElementById('reportTopCategoryText'),
         calendarGrid: document.getElementById('calendarGrid'),
@@ -1810,6 +2834,8 @@ const presetAvatars = [
         homeAvatarPreview: document.getElementById('homeAvatarPreview')
       };
 
+      let profileSaveResetTimer = null;
+
       function uid() {
         return (window.crypto && crypto.randomUUID)
           ? crypto.randomUUID()
@@ -1822,13 +2848,29 @@ const presetAvatars = [
         ) + ' تومان';
       }
 
+      function formatPlainMoney(amount){
+        return toPersianNumber(new Intl.NumberFormat('fa-IR').format(Math.round(amount || 0)));
+      }
+
+      function formatPercent(value, digits = 1) {
+        const number = Number.isFinite(Number(value)) ? Number(value) : 0;
+        return `${toPersianNumber(Math.abs(number).toFixed(digits))}٪`;
+      }
+
+      function normalizeDigitString(value) {
+        return String(value ?? '')
+          .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+          .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+      }
+
+
       function formatMoneyCompact(value) {
         const number = Number.isFinite(Number(value)) ? Number(value) : 0;
         try {
-          return new Intl.NumberFormat('en-US', {
+          return toPersianNumber(new Intl.NumberFormat('en-US', {
             notation: 'compact',
             maximumFractionDigits: 1
-          }).format(Math.round(number));
+          }).format(Math.round(number)));
         } catch (error) {
           return formatMoney(number);
         }
@@ -1838,14 +2880,161 @@ const presetAvatars = [
         return (date.getDay() + 1) % 7;
       }
 
+
+      function getJalaliDateParts(date = new Date()) {
+        const d = date instanceof Date ? date : new Date(date);
+        const [jy, jm, jd] = toJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+        return { jy, jm, jd };
+      }
+
       function buildWeeklyTicks(max) {
         const safeMax = Math.max(1, Number(max) || 0);
         return [safeMax, safeMax * 0.75, safeMax * 0.5, safeMax * 0.25, 0];
       }
 
-      function parseMoneyInput(value) {
+
+      function getDaysInMonth(date = new Date()) {
+        const { jy, jm } = getJalaliDateParts(date);
+        return jalaliDaysInMonth(jy, jm);
+      }
+
+      function getDaysElapsedInMonth(date = new Date()) {
+        const { jd } = getJalaliDateParts(date);
+        return Math.max(1, jd);
+      }
+
+      function formatTransactionDate(timestamp) {
+        const date = Number.isFinite(Number(timestamp)) ? new Date(Number(timestamp)) : new Date();
+        try {
+          const [jy, jm, jd] = toJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
+          const hours = String(date.getHours()).padStart(2, '0');
+          const mins = String(date.getMinutes()).padStart(2, '0');
+          return `${toPersianNumber(jd)} ${jalaliMonthNames[jm - 1]} ${toPersianNumber(jy)}، ساعت ${toPersianNumber(hours)}:${toPersianNumber(mins)}`;
+        } catch (error) {
+          return date.toLocaleDateString('fa-IR');
+        }
+      }
+
+      function formatJalaliDate(timestamp) {
+        const date = Number.isFinite(Number(timestamp)) ? new Date(Number(timestamp)) : new Date();
+        try {
+          const [jy, jm, jd] = toJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
+          return `${toPersianNumber(jd)} ${jalaliMonthNames[jm - 1]} ${toPersianNumber(jy)}`;
+        } catch (error) {
+          return date.toLocaleDateString('fa-IR');
+        }
+      }
+
+      function getPeakExpenseDay(expenses, referenceDate = new Date()) {
+        if (!Array.isArray(expenses) || !expenses.length) return null;
+        const totals = new Map();
+
+        expenses.forEach(t => {
+          const date = new Date(t.createdAt || Date.now());
+          if (date.getFullYear() !== referenceDate.getFullYear() || date.getMonth() !== referenceDate.getMonth()) return;
+          const day = date.getDate();
+          totals.set(day, (totals.get(day) || 0) + Number(t.amount || 0));
+        });
+
+        const peak = Array.from(totals.entries()).sort((a, b) => b[1] - a[1])[0];
+        if (!peak) return null;
+        const [day, amount] = peak;
+        return { day, amount, date: new Date(referenceDate.getFullYear(), referenceDate.getMonth(), day) };
+      }
+
+      function buildFinancialSnapshot(now = new Date()) {
+        const currentMonth = getMonthRange(0, now);
+        const prevMonth = getMonthRange(-1, now);
+
+        const currentExpenses = transactionsInRange(currentMonth.start, currentMonth.end, 'expense');
+        const prevExpenses = transactionsInRange(prevMonth.start, prevMonth.end, 'expense');
+        const currentIncome = transactionsInRange(currentMonth.start, currentMonth.end, 'income');
+        const prevIncome = transactionsInRange(prevMonth.start, prevMonth.end, 'income');
+
+        const currentExpenseTotal = sumTransactions(currentExpenses);
+        const prevExpenseTotal = sumTransactions(prevExpenses);
+        const currentIncomeTotal = sumTransactions(currentIncome);
+        const prevIncomeTotal = sumTransactions(prevIncome);
+
+        const diff = currentExpenseTotal - prevExpenseTotal;
+        const diffPct = prevExpenseTotal > 0 ? (diff / prevExpenseTotal) * 100 : (currentExpenseTotal > 0 ? 100 : 0);
+
+        const daysPassed = getDaysElapsedInMonth(now);
+        const monthDays = getDaysInMonth(now);
+        const averageDailyExpense = currentExpenseTotal / Math.max(1, daysPassed);
+        const projectedExpense = averageDailyExpense * monthDays;
+
+        const currentExpenseDays = countUniqueExpenseDays(currentExpenses);
+        const averageExpenseOnActiveDays = currentExpenseTotal / Math.max(1, currentExpenseDays);
+
+        const rolling30 = getRollingWindow(30, now);
+        const rolling30Expenses = transactionsInRange(rolling30.start, rolling30.end, 'expense');
+        const rolling30Income = transactionsInRange(rolling30.start, rolling30.end, 'income');
+        const rolling30ExpenseTotal = sumTransactions(rolling30Expenses);
+        const rolling30IncomeTotal = sumTransactions(rolling30Income);
+        const rolling30ExpenseAvg = rolling30ExpenseTotal / 30;
+        const rolling30IncomeAvg = rolling30IncomeTotal / 30;
+
+        const averageDailyIncome = currentIncomeTotal / Math.max(1, daysPassed);
+        const averageDailyExpenseInMonth = currentExpenseTotal / Math.max(1, daysPassed);
+
+        const currentTop = getTopCategoryFromList(currentExpenses);
+        const prevTop = getTopCategoryFromList(prevExpenses);
+        const peakExpenseTransaction = getPeakExpenseTransaction(currentExpenses);
+
+        const currentWeek = getWeekWindow(0, 7);
+        const prevWeekStart = new Date(currentWeek.start);
+        prevWeekStart.setDate(prevWeekStart.getDate() - 7);
+
+        const currentWeekExpenses = sumTransactions(transactionsInRange(currentWeek.start, currentWeek.end, 'expense'));
+        const previousWeekExpenses = sumTransactions(transactionsInRange(prevWeekStart, currentWeek.start, 'expense'));
+        const weekDelta = previousWeekExpenses > 0
+          ? ((currentWeekExpenses - previousWeekExpenses) / previousWeekExpenses) * 100
+          : (currentWeekExpenses > 0 ? 100 : 0);
+
+        const peakDay = getPeakExpenseDay(currentExpenses, now);
+        const expenseVsIncomePct = currentIncomeTotal > 0 ? (currentExpenseTotal / currentIncomeTotal) * 100 : null;
+
+        return {
+          now,
+          currentMonth,
+          prevMonth,
+          currentExpenses,
+          prevExpenses,
+          currentIncome,
+          prevIncome,
+          currentExpenseTotal,
+          prevExpenseTotal,
+          currentIncomeTotal,
+          prevIncomeTotal,
+          diff,
+          diffPct,
+          daysPassed,
+          monthDays,
+          averageDailyExpense,
+          projectedExpense,
+          currentExpenseDays,
+          averageExpenseOnActiveDays,
+          rolling30ExpenseTotal,
+          rolling30IncomeTotal,
+          rolling30ExpenseAvg,
+          rolling30IncomeAvg,
+          averageDailyIncome,
+          averageDailyExpenseInMonth,
+          currentTop,
+          prevTop,
+          peakExpenseTransaction,
+          currentWeekExpenses,
+          previousWeekExpenses,
+          weekDelta,
+          peakDay,
+          expenseVsIncomePct
+        };
+      }
+
+function parseMoneyInput(value) {
         if (typeof value === 'number') return Number.isFinite(value) ? Math.round(value) : 0;
-        const cleaned = String(value ?? '').replace(/[^\d-]/g, '');
+        const cleaned = normalizeDigitString(value).replace(/[^\d-]/g, '');
         if (!cleaned || cleaned === '-') return 0;
         const num = Number(cleaned);
         return Number.isFinite(num) ? Math.round(num) : 0;
@@ -2132,6 +3321,9 @@ const presetAvatars = [
 
       function renderProfile() {
         syncProfileToUI();
+        if (els.profileSaveBtn && !els.profileSaveBtn.disabled) {
+          els.profileSaveBtn.textContent = 'ذخیره نام';
+        }
       }
 
       function getIncomeTotal() {
@@ -2159,6 +3351,32 @@ const presetAvatars = [
         els.pages.forEach(page => page.classList.toggle('active-page', page.dataset.page === pageKey));
         els.navItems.forEach(item => item.classList.toggle('active', item.dataset.nav === pageKey));
         syncProfileToUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        switch (pageKey) {
+          case 'home':
+            renderSummary();
+            renderHomeExpenseBreakdown();
+            renderTransactionFilters();
+            renderTransactions();
+            break;
+          case 'analytics':
+            renderAnalytics();
+            break;
+          case 'budget':
+            renderBudgets();
+            renderCategoryManager();
+            renderGoals();
+            break;
+          case 'ai':
+            renderAI();
+            break;
+          case 'profile':
+            renderProfile();
+            break;
+          default:
+            break;
+        }
       }
 
       function openModal() {
@@ -2230,7 +3448,7 @@ const presetAvatars = [
           }
           const current = state.filters.category || 'all';
           els.transactionCategoryFilter.innerHTML = [
-            `<option value="all">همه دسته‌ها</option>`,
+            `<option value="all">همه دسته‌بندی‌ها</option>`,
             ...categories.map(cat => `<option value="${cat.key}" ${current === cat.key ? 'selected' : ''}>${escapeHtml(cat.emoji)} ${escapeHtml(cat.name)}</option>`)
           ].join('');
           els.transactionCategoryFilter.value = current;
@@ -2268,6 +3486,7 @@ const presetAvatars = [
           .sort((a, b) => b.createdAt - a.createdAt);
       }
 
+
       function renderTransactions() {
         const sorted = getFilteredTransactions();
         if (!sorted.length) {
@@ -2293,6 +3512,7 @@ const presetAvatars = [
                 <div class="transaction-body">
                   <div class="transaction-title">${title}</div>
                   <div class="transaction-note">${escapeHtml(t.note || 'بدون توضیح')}</div>
+                  <div class="transaction-date"><i class="fa-regular fa-clock"></i> ${formatTransactionDate(t.createdAt)}</div>
                 </div>
               </div>
               <div class="transaction-right">
@@ -2315,18 +3535,94 @@ const presetAvatars = [
           .replaceAll("'", '&#39;');
       }
 
+
+      function getExpenseBreakdownEntries() {
+        const expenseTotals = new Map();
+        state.categories.filter(c => c.type === 'expense').forEach(cat => expenseTotals.set(cat.key, 0));
+        state.transactions.filter(t => t.type === 'expense').forEach(t => {
+          expenseTotals.set(t.category, (expenseTotals.get(t.category) || 0) + Number(t.amount || 0));
+        });
+        return Array.from(expenseTotals.entries())
+          .map(([key, amount]) => ({ key, amount, name: categoryLabel(key), color: categoryColor(key), emoji: categoryEmoji(key) }))
+          .filter(item => item.amount > 0)
+          .sort((a, b) => b.amount - a.amount);
+      }
+
       function renderSummary() {
         syncProfileToUI();
         const income = getIncomeTotal();
         const expense = getExpenseTotal();
         const balance = getBalance();
+        const budgetBase = Math.max(0, Number(state.initialBalance || 0) + income);
+        const budgetUsagePct = budgetBase > 0 ? clamp(0, (expense / budgetBase) * 100, 100) : 0;
+
         els.incomeAmount.textContent = formatMoney(income);
         els.expenseAmount.textContent = formatMoney(expense);
         els.balanceAmount.textContent = formatMoney(balance);
+
         const net = getNetFlow();
         const netText = net >= 0 ? `خالص: +${formatMoney(net)}` : `خالص: -${formatMoney(Math.abs(net))}`;
         els.netFlowChip.textContent = netText;
+
         if (els.initialBalanceInput) els.initialBalanceInput.value = String(state.initialBalance || 0);
+        if (els.budgetBaseAmount) els.budgetBaseAmount.textContent = formatMoney(budgetBase);
+        if (els.budgetSpentAmount) els.budgetSpentAmount.textContent = formatMoney(expense);
+        if (els.budgetUsagePercent) els.budgetUsagePercent.textContent = formatPercent(budgetUsagePct, 0);
+        if (els.budgetUsageText) {
+          els.budgetUsageText.textContent = `${formatMoney(expense)} از ${formatMoney(budgetBase)}`;
+        }
+        if (els.budgetUsageBar) {
+          els.budgetUsageBar.style.width = `${budgetUsagePct}%`;
+        }
+        if (els.budgetUsageRing) {
+          els.budgetUsageRing.style.setProperty('--usage', `${budgetUsagePct}%`);
+        }
+      }
+
+
+      function renderHomeExpenseBreakdown() {
+        if (!els.homeExpensePieChart || !els.homeExpenseLegend || !els.homeExpensePieTotal) return;
+
+        const entries = getExpenseBreakdownEntries();
+        const total = entries.reduce((sum, item) => sum + item.amount, 0);
+        els.homeExpensePieTotal.textContent = formatMoney(total);
+
+        if (!total) {
+          els.homeExpensePieChart.style.background = 'conic-gradient(from 180deg, rgba(255,255,255,.10) 0deg 360deg)';
+          els.homeExpenseLegend.innerHTML = `
+            <div class="empty-state" style="grid-column:1/-1;padding: 18px 8px">
+              <i class="fa-solid fa-chart-pie"></i>
+              <h4>هنوز هزینه‌ای ثبت نشده</h4>
+              <p>بعد از ثبت هزینه، خلاصه‌ی دسته‌ها اینجا نمایش داده می‌شود.</p>
+            </div>
+          `;
+          return;
+        }
+
+        let cursor = 0;
+        const gradientParts = [];
+        const legendItems = [];
+
+        entries.forEach(item => {
+          const deg = (item.amount / total) * 360;
+          const startDeg = cursor;
+          const endDeg = cursor + deg;
+          gradientParts.push(`${item.color} ${startDeg}deg ${endDeg}deg`);
+          cursor = endDeg;
+          const pct = (item.amount / total) * 100;
+          legendItems.push(`
+            <div class="home-breakdown-item">
+              <div class="home-breakdown-left">
+                <span class="home-breakdown-dot" style="background:${item.color}"></span>
+                <div class="home-breakdown-name">${item.emoji} ${item.name}</div>
+              </div>
+              <div class="home-breakdown-meta">${formatPercent(pct, 1)}</div>
+            </div>
+          `);
+        });
+
+        els.homeExpensePieChart.style.background = `conic-gradient(from 180deg, ${gradientParts.join(', ')})`;
+        els.homeExpenseLegend.innerHTML = legendItems.join('');
       }
 
       function renderAnalytics() {
@@ -2369,7 +3665,7 @@ const presetAvatars = [
                 <span class="legend-dot" style="background:${item.color}"></span>
                 <div>
                   <div class="legend-name">${item.emoji} ${item.name}</div>
-                  <div class="legend-meta">${pct.toFixed(1)}٪ از کل هزینه</div>
+                  <div class="legend-meta">${formatPercent(pct, 1)} از کل هزینه</div>
                 </div>
                 <div class="legend-meta">${formatMoney(item.amount)}</div>
               </div>
@@ -2393,7 +3689,7 @@ const presetAvatars = [
               ${expense
                 ? `بیشترین هزینه شما در دسته <strong>${top ? `${top.emoji} ${top.name}` : 'نامشخص'}</strong> بوده و مجموع هزینه‌ها به <strong>${formatMoney(expense)}</strong> رسیده است.`
                 : 'هنوز داده‌ای برای تحلیل وجود ندارد.'}
-              ${income ? `<br>نرخ نگه‌داشت سرمایه نسبت به درآمد فعلی حدود <strong>${savingsRate.toFixed(1)}٪</strong> است.` : ''}
+              ${income ? `<br>نرخ نگه‌داشت سرمایه نسبت به درآمد فعلی حدود <strong>${formatPercent(savingsRate, 1)}</strong> است.` : ''}
             </p>
           </div>
         `;
@@ -2404,6 +3700,7 @@ const presetAvatars = [
       }
 
       
+
       function renderWeeklyChart() {
         const weeklyChart = document.getElementById('weeklyChart');
         const weeklyYAxis = document.getElementById('weeklyYAxis');
@@ -2411,15 +3708,19 @@ const presetAvatars = [
 
         if (!weeklyChart || !weeklyYAxis) return;
 
-        const labels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
         const now = new Date();
+        // JS getDay(): 0=Sunday ... 6=Saturday
+        // Bar order stays Saturday -> Friday; only labels are corrected.
+        const weekdayLabelsByJsDay = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'];
+
+        const startOfWeek = new Date(now);
+        startOfWeek.setHours(0, 0, 0, 0);
+        startOfWeek.setDate(now.getDate() - ((now.getDay() + 1) % 7)); // Saturday start
+
         const data = [];
-
-        for (let i = 6; i >= 0; i--) {
-          const day = new Date();
-          day.setHours(0, 0, 0, 0);
-          day.setDate(now.getDate() - i);
-
+        for (let i = 0; i < 7; i++) {
+          const day = new Date(startOfWeek);
+          day.setDate(startOfWeek.getDate() + i);
           const next = new Date(day);
           next.setDate(day.getDate() + 1);
 
@@ -2432,7 +3733,8 @@ const presetAvatars = [
             .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
           data.push({
-            label: labels[day.getDay()],
+            weekdayIndex: day.getDay(),
+            label: weekdayLabelsByJsDay[day.getDay()],
             value: total
           });
         }
@@ -2442,10 +3744,10 @@ const presetAvatars = [
 
         weeklyYAxis.innerHTML = ticks.map(value => `<span>${formatMoney(value)}</span>`).join('');
 
-        weeklyChart.innerHTML = data.map(day => {
+        weeklyChart.innerHTML = data.map((day, index) => {
           const height = Math.max((day.value / max) * 100, day.value ? 8 : 4);
           return `
-            <div class="week-col">
+            <div class="week-col" data-week-index="${index}">
               <div class="week-value">${formatMoney(day.value)}</div>
               <div class="week-bar" style="height:${height}%"></div>
               <div class="week-label">${day.label}</div>
@@ -2456,15 +3758,21 @@ const presetAvatars = [
         const totalWeek = data.reduce((s, d) => s + d.value, 0);
         const avgWeek = Math.round(totalWeek / 7);
 
+        
         if (weeklySummary) {
           weeklySummary.innerHTML = `
-            <span>مجموع هفته: <strong>${formatMoney(totalWeek)}</strong></span>
-            <span>میانگین روزانه: <strong>${formatMoney(avgWeek)}</strong></span>
+            <div class="weekly-summary-item">
+              <span>مجموع هفته</span>
+              <strong>${formatMoney(totalWeek)}</strong>
+            </div>
+            <div class="weekly-summary-item">
+              <span>میانگین روزانه</span>
+              <strong>${formatMoney(avgWeek)}</strong>
+            </div>
           `;
         }
+    
       }
-
-
 
       function renderBudgets() {
         const expenseCategories = state.categories.filter(c => c.type === 'expense');
@@ -2498,7 +3806,7 @@ const presetAvatars = [
                   <div>
                     <div class="budget-title">${cat.name}</div>
                     <div class="budget-sub">سقف ماهانه: ${limit ? formatMoney(limit) : 'بدون سقف'}</div>
-                    <div class="budget-sub">مصرف شده: ${pct.toFixed(1)}٪</div>
+                    <div class="budget-sub">مصرف شده: ${formatPercent(pct, 1)}</div>
                   </div>
                 </div>
                 <div class="budget-top-actions">
@@ -2560,8 +3868,8 @@ const presetAvatars = [
               </div>
               <div class="progress"><span style="width:${pct}%;background:${goal.color}"></span></div>
               <div class="goal-footer">
-                <span>${pct.toFixed(1)}٪ تکمیل شده</span>
-                <span>${completed ? 'هدف محقق شد' : `${formatMoney(goal.target - goal.saved)} باقی مانده`}</span>
+                <span>${formatPercent(pct, 1)} تکمیل شده</span>
+                <span>${completed ? '' : `${formatMoney(goal.target - goal.saved)} باقی مانده`}</span>
               </div>
               ${completed ? '<div class="goal-done-badge"><i class="fa-solid fa-circle-check"></i> هدف تکمیل شد</div>' : ''}
               <div class="goal-actions">
@@ -2574,9 +3882,34 @@ const presetAvatars = [
       }
 
       function getMonthRange(offset = 0, base = new Date()) {
-        const start = new Date(base.getFullYear(), base.getMonth() + offset, 1);
-        const end = new Date(base.getFullYear(), base.getMonth() + offset + 1, 1);
-        return { start, end };
+        const baseDate = base instanceof Date ? base : new Date(base);
+        const [baseJY, baseJM] = toJalali(baseDate.getFullYear(), baseDate.getMonth() + 1, baseDate.getDate());
+
+        let targetJY = baseJY;
+        let targetJM = baseJM + Number(offset || 0);
+
+        while (targetJM <= 0) {
+          targetJM += 12;
+          targetJY -= 1;
+        }
+        while (targetJM > 12) {
+          targetJM -= 12;
+          targetJY += 1;
+        }
+
+        const nextJY = targetJM === 12 ? targetJY + 1 : targetJY;
+        const nextJM = targetJM === 12 ? 1 : targetJM + 1;
+
+        const [startGy, startGm, startGd] = fromJalali(targetJY, targetJM, 1);
+        const [endGy, endGm, endGd] = fromJalali(nextJY, nextJM, 1);
+
+        const start = new Date(startGy, startGm - 1, startGd);
+        start.setHours(0, 0, 0, 0);
+
+        const end = new Date(endGy, endGm - 1, endGd);
+        end.setHours(0, 0, 0, 0);
+
+        return { start, end, jYear: targetJY, jMonth: targetJM };
       }
 
       function transactionsInRange(start, end, type = 'all') {
@@ -2609,12 +3942,49 @@ const presetAvatars = [
         return { key: topKey, amount: topAmount, category: topKey ? categoryByKey(topKey) : null };
       }
 
+      function getRollingWindow(days = 30, base = new Date()) {
+        const end = new Date(base);
+        end.setHours(23, 59, 59, 999);
+        const start = new Date(end);
+        start.setDate(start.getDate() - Math.max(0, Number(days || 0) - 1));
+        start.setHours(0, 0, 0, 0);
+        return { start, end };
+      }
+
+      function countUniqueExpenseDays(list) {
+        const days = new Set();
+        (Array.isArray(list) ? list : []).forEach(t => {
+          if (t.type !== 'expense') return;
+          const d = new Date(t.createdAt || Date.now());
+          const [jy, jm, jd] = toJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+          days.add(`${jy}-${jm}-${jd}`);
+        });
+        return days.size;
+      }
+
+      function getPeakExpenseTransaction(list) {
+        const expenses = (Array.isArray(list) ? list : []).filter(t => t.type === 'expense');
+        if (!expenses.length) return null;
+        return expenses.slice().sort((a, b) => {
+          const amountDiff = Number(b.amount || 0) - Number(a.amount || 0);
+          if (amountDiff !== 0) return amountDiff;
+          return Number(b.createdAt || 0) - Number(a.createdAt || 0);
+        })[0] || null;
+      }
+
       function getMonthName(date = new Date()) {
         try {
-          return new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
+          return new Intl.DateTimeFormat('fa-IR-u-ca-persian', { month: 'long', year: 'numeric' }).format(date);
         } catch (e) {
-          return date.toLocaleDateString('en-US');
+          const [jy, jm] = toJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
+          return `${jalaliMonthNames[jm - 1]} ${toPersianNumber(jy)}`;
         }
+      }
+
+function getJalaliMonthLabel(date = new Date()) {
+        const d = date instanceof Date ? date : new Date(date);
+        const [jy, jm] = toJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+        return `${jalaliMonthNames[jm - 1]} ${toPersianNumber(jy)}`;
       }
 
       function getWeekWindow(offsetDays = 0, length = 7) {
@@ -2627,81 +3997,142 @@ const presetAvatars = [
         return { start, end };
       }
 
-      function renderMonthlyReport() {
+
+            function renderMonthlyReport() {
         if (!els.reportCurrentExpense) return;
-        const now = new Date();
-        const currentRange = getMonthRange(0, now);
-        const prevRange = getMonthRange(-1, now);
+        const snapshot = buildFinancialSnapshot(new Date());
 
-        const currentExpenses = transactionsInRange(currentRange.start, currentRange.end, 'expense');
-        const prevExpenses = transactionsInRange(prevRange.start, prevRange.end, 'expense');
+        els.reportCurrentExpense.textContent = formatMoney(snapshot.currentExpenseTotal);
+        els.reportPrevExpense.textContent = formatMoney(snapshot.prevExpenseTotal);
+        els.reportDelta.textContent = `${snapshot.diffPct >= 0 ? '+' : '-'}${formatPercent(Math.abs(snapshot.diffPct), 1)}`;
+        els.reportDailyAvg.textContent = formatMoney(snapshot.averageDailyExpense);
+        if (els.reportExpenseDaysAvg) els.reportExpenseDaysAvg.textContent = formatMoney(snapshot.averageExpenseOnActiveDays);
+        if (els.reportRolling30Avg) els.reportRolling30Avg.textContent = formatMoney(snapshot.rolling30ExpenseAvg);
+        if (els.reportIncomeExpenseAvg) {
+          els.reportIncomeExpenseAvg.innerHTML = `
+            <span>درآمد: ${formatMoney(snapshot.averageDailyIncome)}</span>
+            <span>هزینه: ${formatMoney(snapshot.averageDailyExpenseInMonth)}</span>
+          `;
+        }
 
-        const currentTotal = sumTransactions(currentExpenses);
-        const prevTotal = sumTransactions(prevExpenses);
-        const diff = currentTotal - prevTotal;
-        const diffPct = prevTotal > 0 ? (diff / prevTotal) * 100 : (currentTotal > 0 ? 100 : 0);
-
-        const top = getTopCategoryFromList(currentExpenses);
-        const averageDaily = currentTotal / Math.max(1, now.getDate());
-
-        els.reportCurrentExpense.textContent = formatMoney(currentTotal);
-        els.reportPrevExpense.textContent = formatMoney(prevTotal);
-        els.reportDelta.textContent = `${diffPct >= 0 ? '+' : '-'}${Math.abs(diffPct).toFixed(1)}٪`;
-        els.reportDailyAvg.textContent = formatMoney(averageDaily);
+        if (els.reportPeakExpenseText) {
+          const peak = snapshot.peakExpenseTransaction;
+          if (peak) {
+            const cat = categoryByKey(peak.category);
+            const icon = cat?.emoji || '💸';
+            const name = cat?.name || categoryLabel(peak.category);
+            const note = peak.note ? peak.note : 'بدون توضیح';
+            els.reportPeakExpenseText.innerHTML = `<span>${icon} ${name} — ${note}</span><small>${formatMoney(peak.amount)}</small>`;
+          } else {
+            els.reportPeakExpenseText.textContent = '—';
+          }
+        }
 
         if (els.reportComparisonText) {
-          if (!currentTotal && !prevTotal) {
-            els.reportComparisonText.innerHTML = 'هنوز هزینه‌ای برای مقایسه ثبت نشده است.';
-          } else if (!prevTotal && currentTotal) {
-            els.reportComparisonText.innerHTML = `این ماه تا الان <strong>${formatMoney(currentTotal)}</strong> هزینه ثبت شده و ماه قبل داده‌ای وجود نداشت.`;
+          const currentLabel = getJalaliMonthLabel(snapshot.currentMonth.start);
+          const prevLabel = getJalaliMonthLabel(snapshot.prevMonth.start);
+
+          if (!snapshot.currentExpenseTotal && !snapshot.prevExpenseTotal) {
+            els.reportComparisonText.innerHTML = `هنوز در <strong>${currentLabel}</strong> و <strong>${prevLabel}</strong> هزینه‌ای برای مقایسه ثبت نشده است.`;
+          } else if (!snapshot.prevExpenseTotal && snapshot.currentExpenseTotal) {
+            els.reportComparisonText.innerHTML = `در <strong>${currentLabel}</strong> تا الان <strong>${formatMoney(snapshot.currentExpenseTotal)}</strong> هزینه ثبت شده و در <strong>${prevLabel}</strong> داده‌ای وجود نداشت.`;
           } else {
-            els.reportComparisonText.innerHTML = diff >= 0
-              ? `این ماه <strong>${formatMoney(Math.abs(diff))}</strong> بیشتر از ماه قبل خرج شده است.`
-              : `این ماه <strong>${formatMoney(Math.abs(diff))}</strong> کمتر از ماه قبل خرج شده است.`;
+            els.reportComparisonText.innerHTML = snapshot.diff >= 0
+              ? `در <strong>${currentLabel}</strong> تا الان <strong>${formatMoney(snapshot.currentExpenseTotal)}</strong> ثبت شده که <strong>${formatMoney(Math.abs(snapshot.diff))}</strong> بیشتر از <strong>${prevLabel}</strong> است.`
+              : `در <strong>${currentLabel}</strong> تا الان <strong>${formatMoney(snapshot.currentExpenseTotal)}</strong> ثبت شده که <strong>${formatMoney(Math.abs(snapshot.diff))}</strong> کمتر از <strong>${prevLabel}</strong> است.`;
           }
         }
 
         if (els.reportTopCategoryText) {
-          els.reportTopCategoryText.innerHTML = top.category
-            ? `بیشترین هزینه این ماه مربوط به <strong>${top.category.emoji} ${top.category.name}</strong> بوده است.`
-            : 'هنوز دسته‌ی پرهزینه‌ای در این ماه ثبت نشده است.';
+          els.reportTopCategoryText.innerHTML = snapshot.currentTop.category
+            ? `بیشترین هزینه‌ی این ماه مربوط به دسته‌بندی <strong>${snapshot.currentTop.category.emoji} ${snapshot.currentTop.category.name}</strong> بوده است.`
+            : 'هنوز دسته‌بندی پرهزینه‌ای در این ماه ثبت نشده است.';
+        }
+
+        // Highest and lowest expense category
+        if (els.reportHighestCat || els.reportLowestCat) {
+          const catTotals = new Map();
+          snapshot.currentExpenses.forEach(t => {
+            catTotals.set(t.category, (catTotals.get(t.category) || 0) + Number(t.amount || 0));
+          });
+          const catEntries = Array.from(catTotals.entries())
+            .filter(([, v]) => v > 0)
+            .map(([key, amount]) => {
+              const cat = categoryByKey(key);
+              return { key, amount, cat };
+            })
+            .sort((a, b) => b.amount - a.amount);
+
+          if (els.reportHighestCat) {
+            if (catEntries.length) {
+              const h = catEntries[0];
+              els.reportHighestCat.innerHTML = `<span>${h.cat ? `${h.cat.emoji} ${h.cat.name}` : h.key}</span> <small>${formatMoney(h.amount)}</small>`;
+            } else {
+              els.reportHighestCat.textContent = '—';
+            }
+          }
+          if (els.reportLowestCat) {
+            if (catEntries.length) {
+              const l = catEntries[catEntries.length - 1];
+              els.reportLowestCat.innerHTML = `<span>${l.cat ? `${l.cat.emoji} ${l.cat.name}` : l.key}</span> <small>${formatMoney(l.amount)}</small>`;
+            } else {
+              els.reportLowestCat.textContent = '—';
+            }
+          }
         }
       }
 
-      function renderCalendarView() {
+function renderCalendarView() {
         if (!els.calendarGrid || !els.calendarMonthLabel) return;
 
-        const base = new Date();
-        base.setDate(1);
-        base.setMonth(base.getMonth() + Number(state.calendarMonthOffset || 0));
+        /* --- محاسبه ماه شمسی فعلی + offset --- */
+        const today = new Date();
+        const [todayJY, todayJM, todayJD] = toJalali(today.getFullYear(), today.getMonth() + 1, today.getDate());
 
-        const year = base.getFullYear();
-        const month = base.getMonth();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const firstDay = new Date(year, month, 1);
-        const offset = (firstDay.getDay() + 1) % 7;
+        let jy = todayJY;
+        let jm = todayJM + Number(state.calendarMonthOffset || 0);
 
-        els.calendarMonthLabel.textContent = getMonthName(base);
+        // normalize month overflow/underflow
+        while (jm > 12) { jm -= 12; jy++; }
+        while (jm < 1)  { jm += 12; jy--; }
+
+        const daysInMonth = jalaliDaysInMonth(jy, jm);
+
+        // تبدیل اول ماه شمسی به میلادی برای گرفتن روز هفته
+        const [fgy, fgm, fgd] = fromJalali(jy, jm, 1);
+        const firstGregorian = new Date(fgy, fgm - 1, fgd);
+        // روزهای هفته: شنبه=0 ... جمعه=6 (در JS: 0=Sun,6=Sat)
+        // شنبه در JS = 6
+        const jsDow = firstGregorian.getDay(); // 0=Sun,...,6=Sat
+        // در تقویم شمسی هفته از شنبه شروع می‌شه
+        // شنبه=0, یکشنبه=1, دوشنبه=2, سه‌شنبه=3, چهارشنبه=4, پنجشنبه=5, جمعه=6
+        const offset = (jsDow + 1) % 7; // شنبه(6) -> 0, یکشنبه(0) -> 1 ... جمعه(5) -> 6
+
+        els.calendarMonthLabel.textContent = `${jalaliMonthNames[jm - 1]} ${toPersianNumber(jy)}`;
 
         if (els.calendarTodayBtn) {
           els.calendarTodayBtn.textContent = Number(state.calendarMonthOffset || 0) === 0 ? 'امروز' : 'بازگشت';
         }
 
+        /* --- جمع هزینه‌ها بر اساس روز شمسی --- */
         const dayAmounts = Array.from({ length: daysInMonth }, () => 0);
-        const dayCounts = Array.from({ length: daysInMonth }, () => 0);
+        const dayCounts  = Array.from({ length: daysInMonth }, () => 0);
 
         state.transactions
           .filter(t => t.type === 'expense')
           .forEach(t => {
             const d = new Date(t.createdAt);
-            if (d.getFullYear() !== year || d.getMonth() !== month) return;
-            const day = d.getDate() - 1;
-            dayAmounts[day] += Number(t.amount || 0);
-            dayCounts[day] += 1;
+            const [tjy, tjm, tjd] = toJalali(d.getFullYear(), d.getMonth() + 1, d.getDate());
+            if (tjy !== jy || tjm !== jm) return;
+            const idx = tjd - 1;
+            if (idx >= 0 && idx < daysInMonth) {
+              dayAmounts[idx] += Number(t.amount || 0);
+              dayCounts[idx]  += 1;
+            }
           });
 
         const maxAmount = Math.max(...dayAmounts, 1);
-        const weekLabels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const weekLabels = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
 
         const cells = [];
         weekLabels.forEach(label => {
@@ -2713,25 +4144,27 @@ const presetAvatars = [
         }
 
         for (let day = 1; day <= daysInMonth; day++) {
-          const amount = dayAmounts[day - 1];
-          const count = dayCounts[day - 1];
+          const amount    = dayAmounts[day - 1];
+          const count     = dayCounts[day - 1];
           const intensity = amount / maxAmount;
-          const alpha = amount ? (0.08 + intensity * 0.55) : 0.04;
+          const alpha     = amount ? (0.08 + intensity * 0.55) : 0.04;
           const levelColor = intensity > 0.66 ? '#ff5d7d' : intensity > 0.33 ? '#ffb84d' : '#18e6a6';
-          const isToday = Number(state.calendarMonthOffset || 0) === 0 && new Date().getDate() === day;
-          const dotsCount = count ? Math.min(3, count) : 0;
-          const dots = dotsCount
-            ? `<div class="day-dots">${Array.from({ length: dotsCount }).map((_, i) => `<span class="dot-mini" style="background:${levelColor};opacity:${0.55 + (i * 0.12)}"></span>`).join('')}</div>`
+          const isToday   = Number(state.calendarMonthOffset || 0) === 0 && todayJD === day;
+          const dot = amount
+            ? `<div class="day-dots"><span class="dot-mini" style="background:${levelColor};opacity:${(0.72 + intensity * 0.18).toFixed(2)}"></span></div>`
             : `<div class="day-dots day-empty-note">-</div>`;
 
           cells.push(`
-            <div class="calendar-day ${isToday ? 'today' : ''}" style="background:rgba(106,92,255,${alpha.toFixed(2)})" title="${day} ${getMonthName(base)} - ${formatMoney(amount)}">
+            <div class="calendar-day ${isToday ? 'today' : ''}" style="background:rgba(106,92,255,${alpha.toFixed(2)})" title="${toPersianNumber(day)} ${jalaliMonthNames[jm - 1]} ${toPersianNumber(jy)} - ${formatMoney(amount)}">
               <div class="day-top">
-                <span class="day-num">${day}</span>
-                <span class="day-count">${count ? `${count} تراکنش` : '—'}</span>
+                <span class="day-num">${toPersianNumber(day)}</span>
+                <span class="day-count">${count ? `${toPersianNumber(count)} تراکنش` : '—'}</span>
               </div>
-              <div class="day-amount">${amount ? formatMoney(amount) : '-'}</div>
-              ${dots}
+              <div class="day-amount">
+                <span class="day-amount-money">${amount ? formatPlainMoney(amount) : '-'}</span>
+                ${amount ? '<span class="day-amount-unit">تومان</span>' : ''}
+              </div>
+              ${dot}
             </div>
           `);
         }
@@ -2739,49 +4172,18 @@ const presetAvatars = [
         els.calendarGrid.innerHTML = cells.join('');
       }
 
+
       function renderSmartInsights() {
         if (!els.aiSmartInsights) return;
 
-        const now = new Date();
-        const currentMonth = getMonthRange(0, now);
-        const prevMonth = getMonthRange(-1, now);
-        const currentExpenses = transactionsInRange(currentMonth.start, currentMonth.end, 'expense');
-        const prevExpenses = transactionsInRange(prevMonth.start, prevMonth.end, 'expense');
+        const snapshot = buildFinancialSnapshot(new Date());
+        const currentTopCat = snapshot.currentTop.category;
+        const prevTopAmount = snapshot.prevTop.amount || 0;
+        const currentTopAmount = snapshot.currentTop.amount || 0;
+        const topChangePct = prevTopAmount > 0
+          ? ((currentTopAmount - prevTopAmount) / prevTopAmount) * 100
+          : (currentTopAmount > 0 ? 100 : 0);
 
-        const currentTop = getTopCategoryFromList(currentExpenses);
-        const prevTop = getTopCategoryFromList(prevExpenses);
-
-        const currentTopCat = currentTop.category;
-        const currentTopAmount = currentTop.amount || 0;
-        const prevTopAmount = prevTop.amount || 0;
-        const topChangePct = prevTopAmount > 0 ? ((currentTopAmount - prevTopAmount) / prevTopAmount) * 100 : (currentTopAmount > 0 ? 100 : 0);
-
-        const currentWeek = getWeekWindow(0, 7);
-        const prevWeekEnd = new Date(currentWeek.start);
-        prevWeekEnd.setMilliseconds(prevWeekEnd.getMilliseconds() - 1);
-        const prevWeekStart = new Date(currentWeek.start);
-        prevWeekStart.setDate(prevWeekStart.getDate() - 7);
-
-        const currentWeekExpenses = sumTransactions(transactionsInRange(currentWeek.start, currentWeek.end, 'expense'));
-        const previousWeekExpenses = sumTransactions(transactionsInRange(prevWeekStart, currentWeek.start, 'expense'));
-        const weekDelta = previousWeekExpenses > 0 ? ((currentWeekExpenses - previousWeekExpenses) / previousWeekExpenses) * 100 : (currentWeekExpenses > 0 ? 100 : 0);
-
-        const elapsedDays = Math.max(1, now.getDate());
-        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-        const projectedMonthSpend = (sumTransactions(currentExpenses) / elapsedDays) * daysInMonth;
-        const projectedVsPrev = prevExpenses.length ? ((projectedMonthSpend - sumTransactions(prevExpenses)) / Math.max(1, sumTransactions(prevExpenses))) * 100 : 0;
-
-        const budgetedCategories = state.categories
-          .filter(c => c.type === 'expense' && Number(c.budgetLimit || 0) > 0)
-          .map(cat => {
-            const spent = state.transactions
-              .filter(t => t.type === 'expense' && t.category === cat.key && new Date(t.createdAt).getMonth() === now.getMonth() && new Date(t.createdAt).getFullYear() === now.getFullYear())
-              .reduce((sum, t) => sum + Number(t.amount || 0), 0);
-            return { cat, spent, limit: Number(cat.budgetLimit || 0) };
-          })
-          .sort((a, b) => (b.spent / Math.max(1, b.limit)) - (a.spent / Math.max(1, a.limit)));
-
-        const mostPressured = budgetedCategories[0];
         const insights = [];
 
         insights.push({
@@ -2789,54 +4191,68 @@ const presetAvatars = [
           icon: 'fa-chart-line',
           title: 'تغییر دسته‌ی پرخرج',
           text: currentTopCat
-            ? `هزینه ${currentTopCat.emoji} ${currentTopCat.name} این ماه ${Math.abs(topChangePct).toFixed(1)}٪ ${topChangePct >= 0 ? 'بیشتر' : 'کمتر'} از ماه قبل شده است.`
+            ? `هزینه‌ی ${currentTopCat.emoji} ${currentTopCat.name} این ماه ${formatPercent(Math.abs(topChangePct), 1)} ${topChangePct >= 0 ? 'بیشتر' : 'کمتر'} از ماه قبل شده است.`
             : 'هنوز هزینه‌ی کافی برای مقایسه‌ی دسته‌ها وجود ندارد.'
         });
 
         insights.push({
-          type: weekDelta >= 0 ? 'warn' : 'good',
+          type: snapshot.weekDelta >= 0 ? 'warn' : 'good',
           icon: 'fa-calendar-week',
           title: 'روند هفتگی',
-          text: `این هفته نسبت به ۷ روز قبل ${Math.abs(weekDelta).toFixed(1)}٪ ${weekDelta >= 0 ? 'بیشتر' : 'کمتر'} خرج کرده‌ای.`
+          text: `این هفته نسبت به ۷ روز قبل ${formatPercent(Math.abs(snapshot.weekDelta), 1)} ${snapshot.weekDelta >= 0 ? 'بیشتر' : 'کمتر'} خرج کرده‌ای.`
         });
 
         insights.push({
           type: 'good',
           icon: 'fa-chart-simple',
           title: 'پیش‌بینی پایان ماه',
-          text: `اگر همین روند ادامه پیدا کند، هزینه‌ی ماهانه‌ی تو حدود ${formatMoney(projectedMonthSpend)} خواهد شد که ${projectedVsPrev >= 0 ? Math.abs(projectedVsPrev).toFixed(1) + '٪ بیشتر' : Math.abs(projectedVsPrev).toFixed(1) + '٪ کمتر'} از ماه قبل است.`
+          text: `اگر همین روند ادامه پیدا کند، هزینه‌ی ماهانه‌ی تو حدود ${formatMoney(snapshot.projectedExpense)} خواهد شد.`
         });
 
-        if (mostPressured) {
-          const remaining = mostPressured.limit - mostPressured.spent;
-          const avgDaily = mostPressured.spent / elapsedDays;
-          const daysLeft = avgDaily > 0 ? remaining / avgDaily : Infinity;
+        if (snapshot.currentIncomeTotal > 0) {
           insights.push({
-            type: remaining <= 0 ? 'bad' : daysLeft <= 5 ? 'warn' : 'good',
-            icon: remaining <= 0 ? 'fa-burst' : 'fa-hourglass-half',
-            title: 'پیش‌بینی بودجه',
-            text: remaining <= 0
-              ? `بودجه ${mostPressured.cat.emoji} ${mostPressured.cat.name} از سقف خودش عبور کرده است.`
-              : `اگر همین روند ادامه پیدا کند، بودجه ${mostPressured.cat.emoji} ${mostPressured.cat.name} حدود ${Math.max(1, Math.ceil(daysLeft))} روز دیگر تمام می‌شود.`
-          });
-
-          insights.push({
-            type: 'good',
-            icon: 'fa-piggy-bank',
-            title: 'فرصت صرفه‌جویی',
-            text: `اگر فقط ۱۰٪ از هزینه‌ی ${mostPressured.cat.name} کم شود، تا پایان این ماه حدود ${formatMoney(currentTopAmount * 0.10)} بیشتر کنار می‌گذاری.`
-          });
-        } else {
-          insights.push({
-            type: 'good',
-            icon: 'fa-seedling',
-            title: 'وضعیت بودجه',
-            text: 'هنوز بودجه‌ی فعالی برای تحلیل دقیق وجود ندارد؛ برای دسته‌ها سقف تعریف کن تا هشدارها فعال شوند.'
+            type: snapshot.expenseVsIncomePct > 100 ? 'warn' : 'good',
+            icon: 'fa-scale-balanced',
+            title: 'نسبت هزینه به درآمد',
+            text: `هزینه‌های این ماه حدود ${formatPercent(snapshot.expenseVsIncomePct, 0)} از درآمد ثبت‌شده را تشکیل داده‌اند.`
           });
         }
 
-        els.aiSmartInsights.innerHTML = insights.map(item => `
-          <article class="smart-insight ${item.type}">
+        if (snapshot.peakDay) {
+          const weekdayLabels = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'];
+          const exactDate = formatJalaliDate(snapshot.peakDay.date);
+          insights.push({
+            type: 'warn',
+            icon: 'fa-fire-flame-curved',
+            title: 'روز اوج هزینه',
+            text: `بیشترین خرج این ماه در روز ${weekdayLabels[snapshot.peakDay.date.getDay()]}، ${exactDate} رخ داده و مجموع آن به ${formatMoney(snapshot.peakDay.amount)} رسیده است.`
+          });
+        }
+
+        const budgetedCategories = state.categories
+          .filter(c => c.type === 'expense' && Number(c.budgetLimit || 0) > 0)
+          .map(cat => {
+            const spent = state.transactions
+              .filter(t => t.type === 'expense' && t.category === cat.key)
+              .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+            const usage = cat.budgetLimit > 0 ? (spent / cat.budgetLimit) * 100 : 0;
+            return { cat, spent, usage };
+          })
+          .filter(item => item.spent > 0)
+          .sort((a, b) => b.usage - a.usage);
+
+        if (budgetedCategories.length) {
+          const hottest = budgetedCategories[0];
+          insights.push({
+            type: hottest.usage >= 90 ? 'warn' : 'good',
+            icon: 'fa-wallet',
+            title: 'نزدیک‌ترین سقف بودجه',
+            text: `دسته‌ی ${hottest.cat.emoji} ${hottest.cat.name} تا الان ${formatPercent(hottest.usage, 0)} از سقف خودش را مصرف کرده است.`
+          });
+        }
+
+        const nodes = insights.map((item, index) => `
+          <article class="smart-insight ${item.type}" style="animation-delay:${index * 90}ms">
             <div class="si-icon"><i class="fa-solid ${item.icon}"></i></div>
             <div class="si-body">
               <h4>${item.title}</h4>
@@ -2844,6 +4260,42 @@ const presetAvatars = [
             </div>
           </article>
         `).join('');
+
+        els.aiSmartInsights.innerHTML = nodes;
+        renderAnalysisInsight(snapshot);
+      }
+
+      function renderAnalysisInsight(snapshot = buildFinancialSnapshot(new Date())) {
+        if (!els.analyticsInsight) return;
+
+        const weekdayLabels = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'];
+        const chips = [
+          `<span class="chip">میانگین روزانه: <strong>${formatMoney(snapshot.averageDailyExpense)}</strong></span>`,
+          `<span class="chip">پیش‌بینی ماه: <strong>${formatMoney(snapshot.projectedExpense)}</strong></span>`
+        ];
+
+        if (snapshot.expenseVsIncomePct !== null) {
+          chips.push(`<span class="chip">هزینه / درآمد: <strong>${formatPercent(snapshot.expenseVsIncomePct, 0)}</strong></span>`);
+        }
+
+        if (snapshot.peakDay) {
+          chips.push(`<span class="chip">روز اوج: <strong>${weekdayLabels[snapshot.peakDay.date.getDay()]}، ${formatJalaliDate(snapshot.peakDay.date)}</strong></span>`);
+        }
+
+        const summary = snapshot.currentExpenseTotal
+          ? `این ماه تا امروز <strong>${formatMoney(snapshot.currentExpenseTotal)}</strong> هزینه ثبت شده است و میانگین روزانه بر اساس روزهای سپری‌شده محاسبه می‌شود.`
+          : 'هنوز داده‌ای برای تحلیل هوشمند ثبت نشده است. بعد از ثبت تراکنش، جمع‌بندی و پیشنهادها اینجا نمایش داده می‌شوند.';
+
+        els.analyticsInsight.innerHTML = `
+          <div class="insight-icon">
+            <i class="fa-solid fa-brain"></i>
+          </div>
+          <div class="insight-body">
+            <h3>تحلیل هوشمند</h3>
+            <p>${summary}</p>
+            <div class="chips" style="margin-top:12px">${chips.join('')}</div>
+          </div>
+        `;
       }
 
       function renderAI() {
@@ -2853,7 +4305,6 @@ const presetAvatars = [
       function renderAll() {
         renderSummary();
         renderProfile();
-        renderCategoryChips();
         renderTransactionFilters();
         renderTransactions();
         renderTransactionCategories();
@@ -2861,6 +4312,7 @@ const presetAvatars = [
         renderBudgets();
         renderCategoryManager();
         renderGoals();
+        renderHomeExpenseBreakdown();
         renderAI();
       }
 
@@ -2900,8 +4352,7 @@ const presetAvatars = [
       function setInitialBalance() {
         state.initialBalance = Math.max(0, parseMoneyInput(els.initialBalanceInput.value));
         persistInitialBalance();
-        renderSummary();
-        renderAnalytics();
+        renderAll();
       }
 
       function addCategory() {
@@ -3059,9 +4510,9 @@ const presetAvatars = [
 
       function setupTheme() {
         document.body.classList.toggle('light-mode', state.theme === 'light');
-        if (els.themeToggle) els.themeToggle.checked = state.theme !== 'light';
-        if (els.themeQuickToggle) {
-          els.themeQuickToggle.innerHTML = state.theme === 'light'
+        if (els.themeToggle) els.themeToggle.checked = state.theme === 'light';
+        if (els.profileThemeToggle) {
+          els.profileThemeToggle.innerHTML = state.theme === 'light'
             ? '<i class="fa-solid fa-sun"></i>'
             : '<i class="fa-solid fa-moon"></i>';
         }
@@ -3079,7 +4530,9 @@ const presetAvatars = [
       function setupEventHandlers() {
         els.navItems.forEach(btn => {
           btn.addEventListener('click', () => {
-            setActivePage(btn.dataset.nav);
+            const target = btn.dataset.nav;
+            if (!target) return;
+            setActivePage(target);
           });
         });
 
@@ -3088,7 +4541,9 @@ const presetAvatars = [
         });
 
         els.openModalBtn.addEventListener('click', openModal);
-        els.quickAddTransaction.addEventListener('click', openModal);
+        document.querySelectorAll('[data-open-modal]').forEach(btn => {
+          if (btn !== els.openModalBtn) btn.addEventListener('click', openModal);
+        });
         els.closeModalBtn.addEventListener('click', closeModal);
         els.transactionModal.addEventListener('click', e => {
           if (e.target === els.transactionModal) closeModal();
@@ -3149,6 +4604,14 @@ const presetAvatars = [
           });
         }
 
+        if (els.filterToggle && els.filterPanel) {
+          els.filterToggle.addEventListener('click', () => {
+            const open = els.filterPanel.classList.toggle('open');
+            els.filterToggle.classList.toggle('active', open);
+            els.filterToggle.setAttribute('aria-expanded', String(open));
+          });
+        }
+
         if (els.weeklyChart) {
           els.weeklyChart.addEventListener('click', e => {
             const selected = e.target.closest('[data-week-index]');
@@ -3183,8 +4646,17 @@ const presetAvatars = [
           if (e.key === 'Enter') setInitialBalance();
         });
 
-        els.themeToggle.addEventListener('change', toggleTheme);
-        els.themeQuickToggle.addEventListener('click', toggleTheme);
+        if (els.homeProfileBtn) {
+          els.homeProfileBtn.addEventListener('click', () => setActivePage('profile'));
+        }
+
+        if (els.profileThemeToggle) {
+          els.profileThemeToggle.addEventListener('click', toggleTheme);
+        }
+
+        if (els.themeToggle) {
+          els.themeToggle.addEventListener('change', toggleTheme);
+        }
 
         els.addCategoryBtn.addEventListener('click', addCategory);
         els.categoryList.addEventListener('click', e => {
@@ -3210,14 +4682,12 @@ const presetAvatars = [
         });
 
         if (els.profileNameInput) {
-          const applyProfileName = () => {
-            state.profile.name = String(els.profileNameInput.value || '').trim() || 'کاربر';
-            persistProfileAndSync();
-          };
-
-          els.profileNameInput.addEventListener('input', applyProfileName);
-          els.profileNameInput.addEventListener('change', applyProfileName);
-          els.profileNameInput.addEventListener('blur', applyProfileName);
+          els.profileNameInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              els.profileSaveBtn?.click();
+            }
+          });
         }
 
         if (els.profileAvatarGrid) {
@@ -3267,8 +4737,20 @@ const presetAvatars = [
 
         if (els.profileSaveBtn) {
           els.profileSaveBtn.addEventListener('click', () => {
-            state.profile.name = String(els.profileNameInput?.value || '').trim() || 'کاربر';
-            persistProfileAndSync();
+            const nextName = String(els.profileNameInput?.value || '').trim() || 'کاربر';
+            state.profile.name = nextName;
+            persistProfile();
+            syncProfileToUI();
+
+            els.profileSaveBtn.textContent = 'ذخیره شد';
+            els.profileSaveBtn.disabled = true;
+            clearTimeout(profileSaveResetTimer);
+            profileSaveResetTimer = setTimeout(() => {
+              if (els.profileSaveBtn) {
+                els.profileSaveBtn.textContent = 'ذخیره نام';
+                els.profileSaveBtn.disabled = false;
+              }
+            }, 3000);
           });
         }
 
@@ -3379,7 +4861,6 @@ const presetAvatars = [
         ensurePageConsistency();
         syncProfileToUI();
         renderTransactionCategories();
-        renderCategoryChips();
         renderCategoriesToModal();
       }
 
