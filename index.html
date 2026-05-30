@@ -2196,7 +2196,290 @@
         color: rgb(22, 22, 22);
       }
     
-</style>
+
+    /* --- Finora cleanup overrides --- */
+    .weekly-chart-shell{
+      display:grid !important;
+      grid-template-columns:56px minmax(0,1fr) !important;
+      gap:12px !important;
+      align-items:stretch !important;
+    }
+
+    .weekly-y-axis{
+      height:220px !important;
+      display:flex !important;
+      flex-direction:column !important;
+      justify-content:space-between !important;
+      font-size:.72rem !important;
+      color:var(--muted) !important;
+    }
+
+    .weekly-y-axis span{
+      line-height:1;
+    }
+
+    .weekly-chart-area{
+      position:relative !important;
+      height:260px !important;
+      overflow:hidden !important;
+    }
+
+    .weekly-grid-lines{
+      position:absolute !important;
+      inset:0 !important;
+      display:flex !important;
+      flex-direction:column !important;
+      justify-content:space-between !important;
+      pointer-events:none !important;
+    }
+
+    .weekly-grid-lines span{
+      display:block !important;
+      width:100% !important;
+      border-top:1px solid rgba(255,255,255,.10) !important;
+      opacity:.7 !important;
+    }
+
+    .weekly-bars{
+      position:absolute !important;
+      inset:auto 0 0 0 !important;
+      height:220px !important;
+      display:flex !important;
+      align-items:flex-end !important;
+      gap:10px !important;
+      padding-top:0 !important;
+      z-index:1;
+    }
+
+    .week-col{
+      flex:1 1 0 !important;
+      min-width:0 !important;
+      height:100% !important;
+      display:flex !important;
+      flex-direction:column !important;
+      justify-content:flex-end !important;
+      align-items:center !important;
+      gap:8px !important;
+      position:relative !important;
+    }
+
+    .week-bar-wrap{
+      width:100% !important;
+      flex:1 1 auto !important;
+      display:flex !important;
+      align-items:flex-end !important;
+      justify-content:center !important;
+      min-height:0 !important;
+    }
+
+    .week-bar{
+      width:min(100%, 38px) !important;
+      min-height:12px !important;
+      border-radius:18px 18px 8px 8px !important;
+      box-shadow:0 10px 20px rgba(106,92,255,.14) !important;
+      transition:.25s ease !important;
+    }
+
+    .week-value{
+      position:absolute !important;
+      top:-6px !important;
+      left:50% !important;
+      transform:translate(-50%,-100%) !important;
+      opacity:0 !important;
+      font-size:.72rem !important;
+      padding:4px 8px !important;
+      border-radius:999px !important;
+      background:rgba(0,0,0,.75) !important;
+      border:1px solid rgba(255,255,255,.12) !important;
+      white-space:nowrap !important;
+      pointer-events:none !important;
+      transition:opacity .18s ease !important;
+      z-index:10 !important;
+    }
+    .week-col:hover .week-value{
+      opacity:1 !important;
+    }
+    .week-col.active-label .week-value{
+      opacity:1 !important;
+    }
+
+    .week-label{
+      margin-top:0 !important;
+      font-size:.8rem !important;
+      color:var(--muted) !important;
+      white-space:nowrap !important;
+    }
+
+    @media (max-width: 520px){
+      .weekly-chart-shell{
+        grid-template-columns:42px minmax(0,1fr) !important;
+        gap:8px !important;
+      }
+      .weekly-y-axis{
+        font-size:.62rem !important;
+        height:220px !important;
+      }
+      .weekly-chart-area{
+        height:250px !important;
+      }
+      .weekly-bars{
+        height:208px !important;
+        gap:6px !important;
+      }
+      .week-bar{
+        width:min(100%, 28px) !important;
+      }
+      .week-label{
+        font-size:.72rem !important;
+      }
+    }
+
+    .ai-card.ai-placeholder{
+      position:relative !important;
+      overflow:hidden !important;
+      isolation:isolate;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(0,210,255,.18), transparent 20%),
+        radial-gradient(circle at 88% 18%, rgba(255,60,172,.16), transparent 18%),
+        radial-gradient(circle at 18% 82%, rgba(24,230,166,.13), transparent 20%),
+        radial-gradient(circle at 82% 78%, rgba(106,92,255,.18), transparent 24%),
+        linear-gradient(135deg, rgba(7,11,23,.92), rgba(16,19,34,.94), rgba(7,11,23,.92)) !important;
+      border:1px solid rgba(255,255,255,.10) !important;
+      box-shadow:0 24px 60px rgba(0,0,0,.24), inset 0 0 0 1px rgba(255,255,255,.04) !important;
+    }
+
+    .ai-card.ai-placeholder::before{
+      content:'';
+      position:absolute;
+      inset:-30%;
+      background:
+        conic-gradient(from 180deg,
+          rgba(0,210,255,.0),
+          rgba(0,210,255,.22),
+          rgba(106,92,255,.18),
+          rgba(255,60,172,.20),
+          rgba(24,230,166,.16),
+          rgba(0,210,255,.0));
+      filter:blur(30px);
+      opacity:.7;
+      animation:aiGlowSpin 14s linear infinite;
+      z-index:0;
+    }
+
+    .ai-card.ai-placeholder::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.08), transparent 18%),
+        radial-gradient(circle at 75% 25%, rgba(255,255,255,.05), transparent 16%),
+        radial-gradient(circle at 35% 75%, rgba(255,255,255,.06), transparent 18%);
+      opacity:.75;
+      animation:aiGlowFloat 9s ease-in-out infinite alternate;
+      z-index:0;
+    }
+
+    .ai-card.ai-placeholder > *{
+      position:relative;
+      z-index:1;
+    }
+
+    .ai-card.ai-placeholder .section-head h3{
+      letter-spacing:.02em;
+    }
+
+    .coming-soon{
+      position:relative;
+      overflow:hidden;
+      border-radius:24px;
+      background:
+        linear-gradient(135deg, rgba(10,14,32,.72), rgba(20,28,52,.78)),
+        linear-gradient(135deg, rgba(0,210,255,.12), rgba(255,60,172,.10), rgba(24,230,166,.08)) !important;
+      border:1px solid rgba(255,255,255,.10) !important;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.03),
+        0 18px 40px rgba(0,0,0,.16),
+        0 0 0 1px rgba(106,92,255,.06) !important;
+    }
+
+    .coming-soon::before,
+    .coming-soon::after{
+      content:'';
+      position:absolute;
+      inset:-30%;
+      z-index:0;
+      pointer-events:none;
+    }
+
+    .coming-soon::before{
+      background:
+        radial-gradient(circle at 25% 35%, rgba(0,210,255,.35), transparent 18%),
+        radial-gradient(circle at 72% 28%, rgba(255,60,172,.30), transparent 19%),
+        radial-gradient(circle at 56% 78%, rgba(24,230,166,.24), transparent 20%),
+        radial-gradient(circle at 18% 78%, rgba(106,92,255,.24), transparent 18%);
+      filter:blur(18px);
+      opacity:.8;
+      animation:aiAuraDrift 8s ease-in-out infinite alternate;
+    }
+
+    .coming-soon::after{
+      background:conic-gradient(from 90deg, rgba(0,210,255,.0), rgba(0,210,255,.18), rgba(106,92,255,.22), rgba(255,60,172,.18), rgba(24,230,166,.16), rgba(0,210,255,.0));
+      filter:blur(26px);
+      opacity:.55;
+      animation:aiGlowSpin 16s linear infinite reverse;
+    }
+
+    .coming-soon > *{
+      position:relative;
+      z-index:1;
+    }
+
+    .coming-soon i{
+      color:transparent !important;
+      background:linear-gradient(135deg, #00d2ff, #6a5cff, #ff3cac, #18e6a6);
+      -webkit-background-clip:text;
+      background-clip:text;
+      filter:drop-shadow(0 0 18px rgba(106,92,255,.35));
+      animation:aiPulseIcon 2.8s ease-in-out infinite;
+    }
+
+    .coming-soon h3{
+      background:linear-gradient(135deg, #f8fafc, #7dd3fc, #c4b5fd, #f9a8d4);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      font-weight:800;
+      text-shadow:0 0 24px rgba(255,255,255,.08);
+    }
+
+    .coming-soon p{
+      color:rgba(248,250,252,.74) !important;
+      line-height:1.9 !important;
+    }
+
+    @keyframes aiGlowSpin{
+      from{transform:rotate(0deg)}
+      to{transform:rotate(360deg)}
+    }
+    @keyframes aiGlowFloat{
+      0%{transform:translate3d(-2%, -1%, 0) scale(1)}
+      100%{transform:translate3d(2%, 1.5%, 0) scale(1.04)}
+    }
+    @keyframes aiAuraDrift{
+      0%{transform:translate3d(-1.5%, -1%, 0) scale(.98)}
+      100%{transform:translate3d(1.8%, 1.4%, 0) scale(1.05)}
+    }
+    @keyframes aiPulseIcon{
+      0%,100%{transform:scale(1); filter:drop-shadow(0 0 14px rgba(106,92,255,.25))}
+      50%{transform:scale(1.08); filter:drop-shadow(0 0 24px rgba(0,210,255,.35))}
+    }
+
+    /* ensure completed goals no longer show add controls */
+    .goal-card-complete .goal-actions{
+      display:none !important;
+    }
+
+  </style>
 </head>
 <body>
   <div class="app-shell">
@@ -3628,7 +3911,28 @@ function parseMoneyInput(value) {
           els.budgetUsageBar.style.width = `${budgetUsagePct}%`;
         }
         if (els.budgetUsageRing) {
-          els.budgetUsageRing.style.setProperty('--usage', `${budgetUsagePct}%`);
+          // Reset to 0 first, then animate to target
+          els.budgetUsageRing.style.setProperty('--usage', '0%');
+          if (els.budgetUsagePercent) els.budgetUsagePercent.textContent = formatPercent(0, 0);
+
+          const duration = 900;
+          const startTime = performance.now();
+          const targetPct = budgetUsagePct;
+
+          function animateRing(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // ease-out cubic
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = targetPct * eased;
+            els.budgetUsageRing.style.setProperty('--usage', `${current}%`);
+            if (els.budgetUsagePercent) {
+              els.budgetUsagePercent.textContent = formatPercent(current, 0);
+            }
+            if (progress < 1) requestAnimationFrame(animateRing);
+          }
+
+          requestAnimationFrame(animateRing);
         }
       }
 
@@ -3797,21 +4101,33 @@ function parseMoneyInput(value) {
 
         weeklyYAxis.innerHTML = ticks.map(value => `<span>${formatMoney(value)}</span>`).join('');
 
+        const BARS_HEIGHT = 220; // must match .weekly-bars height in CSS
         weeklyChart.innerHTML = data.map((day, index) => {
-          const height = Math.max((day.value / max) * 100, day.value ? 8 : 4);
+          const barPx = Math.max(Math.round((day.value / max) * BARS_HEIGHT), day.value ? 12 : 4);
           return `
             <div class="week-col" data-week-index="${index}">
               <div class="week-value">${formatMoney(day.value)}</div>
-              <div class="week-bar" style="height:${height}%"></div>
+              <div class="week-bar-wrap">
+                <div class="week-bar" style="height:${barPx}px"></div>
+              </div>
               <div class="week-label">${day.label}</div>
             </div>
           `;
         }).join('');
 
+        // Mobile tap: show label on tap, hide on next tap or outside click
+        weeklyChart.querySelectorAll('.week-col').forEach(col => {
+          col.addEventListener('click', e => {
+            e.stopPropagation();
+            const isActive = col.classList.contains('active-label');
+            weeklyChart.querySelectorAll('.week-col').forEach(c => c.classList.remove('active-label'));
+            if (!isActive) col.classList.add('active-label');
+          });
+        });
+
         const totalWeek = data.reduce((s, d) => s + d.value, 0);
         const avgWeek = Math.round(totalWeek / 7);
 
-        
         if (weeklySummary) {
           weeklySummary.innerHTML = `
             <div class="weekly-summary-item">
@@ -3824,7 +4140,6 @@ function parseMoneyInput(value) {
             </div>
           `;
         }
-    
       }
 
       function renderBudgets() {
@@ -3919,16 +4234,16 @@ function parseMoneyInput(value) {
                   <i class="fa-solid fa-trash"></i>
                 </button>
               </div>
-              <div class="progress"><span style="width:${pct}%;background:${goal.color}"></span></div>
+              <div class="progress"><span style="width:${pct}%;background:#18e6a6"></span></div>
               <div class="goal-footer">
                 <span>${formatPercent(pct, 1)} تکمیل شده</span>
                 <span>${completed ? '' : `${formatMoney(goal.target - goal.saved)} باقی مانده`}</span>
               </div>
-              ${completed ? '<div class="goal-done-badge"><i class="fa-solid fa-circle-check"></i> هدف تکمیل شد</div>' : ''}
+              ${completed ? '<div class="goal-done-badge"><i class="fa-solid fa-circle-check"></i> هدف تکمیل شد</div>' : `
               <div class="goal-actions">
                 <input class="input" type="number" data-goal-amount="${goal.id}" placeholder="مبلغ اضافه کن">
                 <button class="add-btn" type="button" data-add-to-goal="${goal.id}">اضافه کن</button>
-              </div>
+              </div>`}
             </article>
           `;
         }).join('');
@@ -4862,6 +5177,10 @@ function renderCalendarView() {
 
         document.addEventListener('click', e => {
           if (e.target.closest('#resetDataBtn')) resetData();
+          // Close weekly bar labels when clicking outside
+          if (!e.target.closest('.week-col')) {
+            document.querySelectorAll('.week-col.active-label').forEach(c => c.classList.remove('active-label'));
+          }
         });
       }
 
