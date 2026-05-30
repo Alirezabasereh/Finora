@@ -67,7 +67,7 @@
     .app-shell{
       width:min(100%, 560px);
       margin:0 auto;
-      padding:18px 16px 128px;
+      padding:18px 16px 90px;
     }
 
     .glass{
@@ -109,6 +109,11 @@
       border:none;
       transition:.22s ease;
     }
+
+    
+    .ghost-btn{
+      border-radius: 18px;
+    }
     .icon-btn{
       width:54px;height:54px;border-radius:18px;color:var(--text);
       display:grid;place-items:center;background:var(--card);
@@ -124,7 +129,7 @@
     .balance-card{
       position:relative;
       overflow:hidden;
-      padding:10px;
+      padding:15px;
       margin-bottom:16px;
       min-height:150px;
     }
@@ -277,6 +282,13 @@
       gap:10px;
       margin-bottom:14px;
     }
+
+    @media screen and (min-width:360px) and (max-width:404px) {
+      .section-head h3,.page-title{font-size:.9rem !important}
+    .section-head span,.section-head p{color:var(--muted);font-size:.75rem !important}
+      
+    }
+
     .section-head h3,.page-title{font-size:1.15rem}
     .section-head span,.section-head p{color:var(--muted);font-size:.9rem}
 
@@ -578,6 +590,10 @@
       padding:34px 18px;
       color:var(--muted);
     }
+
+    .coming-soon h3{
+      margin-bottom: 10px;
+    }
     .coming-soon i{font-size:2.4rem;color:var(--accent1);margin-bottom:10px}
     .settings-list{display:grid;gap:12px}
     .setting-item{
@@ -847,8 +863,18 @@
     }
     .reset-confirm-card h3{margin-bottom:10px;font-size:1.15rem;}
     .reset-confirm-card p{color:var(--muted);line-height:1.9;font-size:.95rem;margin-bottom:18px;}
-    .reset-confirm-actions{display:flex;gap:10px;}
-    .reset-confirm-actions button{flex:1;}
+    .reset-confirm-actions{display:flex;gap:10px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    }
+
+    .reset-confirm-actions button{
+      width: 50% !important;
+      height: 100%;
+          margin-top: 0px !important;
+    }
+    
     .danger-btn{background:linear-gradient(135deg,#ff5d7d,#ff8a65);color:#fff;}
     .danger-btn:hover{filter:brightness(1.03);}
 
@@ -1817,7 +1843,7 @@
 
 @media screen and (max-width:391px) {
   .weekly-chart-shell{
-            grid-template-columns:22px minmax(0,1fr) !important;
+            grid-template-columns:20px minmax(0,1fr) !important;
 
   }
 }
@@ -1897,8 +1923,8 @@
 
     .profile-page-head{
       display:flex;
-      align-items:center;
       justify-content:space-between;
+      align-content: center;
       gap:12px;
     }
     .profile-page-head > div{
@@ -2163,7 +2189,7 @@
     }
     
       .profile-page-head{
-        align-items:flex-start;
+        align-items:center;
       }
 
       option{
@@ -2510,7 +2536,7 @@
         <section class="glass insight-card" id="analyticsInsight" style="margin-top:16px"></section>
         <div class="coming-soon" style="margin-top:14px">
           <i class="fa-solid fa-brain"></i>
-          <h3>فعلاً فقط تحلیل‌های خودکار</h3>
+          <h3>چت با دستیار هوش مصنوعی</h3>
           <p class="muted">در نسخه‌های بعدی این بخش به گفت‌وگوی هوشمند و پیشنهادهای عمیق‌تر ارتقا پیدا می‌کند.</p>
         </div>
       </section>
