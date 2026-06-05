@@ -7415,18 +7415,135 @@ function renderCalendarView() {
       }
 
       // ─── PWA ───
+      // function setupPWA() {
+      //   const manifest = {name:'Finora',short_name:'Finora',description:'مدیریت مالی شخصی',
+      //     start_url:'./index.html',display:'standalone',background_color:'#070b17',theme_color:'#070b17',
+      //     icons:[{src:"data:image/svg+xml,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='110' fill='%236a5cff'/><text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='280' font-family='sans-serif'>₣</text></svg>"),sizes:'512x512',type:'image/svg+xml',purpose:'any maskable'}]};
+      //   const mBlob = new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+      //   const link = document.getElementById('pwaManifest');
+      //   if (link) link.href = URL.createObjectURL(mBlob);
+      //   if ('serviceWorker' in navigator) {
+      //     const sw = "const C='finora-v1';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['.'])));self.skipWaiting()});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim()});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{caches.open(C).then(c=>c.put(e.request,res.clone()));return res}).catch(()=>caches.match('.'))))});";
+      //     navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
+      //   }
+      // }
+
       function setupPWA() {
-        const manifest = {name:'Finora',short_name:'Finora',description:'مدیریت مالی شخصی',
-          start_url:'.',display:'standalone',background_color:'#070b17',theme_color:'#070b17',
-          icons:[{src:"data:image/svg+xml,"+encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='110' fill='%236a5cff'/><text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='280' font-family='sans-serif'>₣</text></svg>"),sizes:'512x512',type:'image/svg+xml',purpose:'any maskable'}]};
-        const mBlob = new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
-        const link = document.getElementById('pwaManifest');
-        if (link) link.href = URL.createObjectURL(mBlob);
-        if ('serviceWorker' in navigator) {
-          const sw = "const C='finora-v1';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(['.'])));self.skipWaiting()});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim()});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{caches.open(C).then(c=>c.put(e.request,res.clone()));return res}).catch(()=>caches.match('.'))))});";
-          navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'}))).catch(()=>{});
-        }
-      }
+    // 1. منیفست
+    const manifest = {
+        name: 'Finora',
+        short_name: 'Finora',
+        description: 'مدیریت مالی شخصی',
+        start_url: './index.html',  // ✅ اصلاح شد
+        display: 'standalone',
+        background_color: '#070b17',
+        theme_color: '#070b17',
+        icons: [{
+            src: "data:image/svg+xml," + encodeURIComponent(
+                "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>" +
+                "<rect width='512' height='512' rx='110' fill='%236a5cff'/>" +
+                "<text x='50%' y='58%' dominant-baseline='middle' text-anchor='middle' fill='white' font-size='280' font-family='sans-serif'>₣</text>" +
+                "</svg>"
+            ),
+            sizes: '512x512',
+            type: 'image/svg+xml',
+            purpose: 'any maskable'
+        }]
+    };
+    
+    // 2. نصب منیفست (روش بهتر)
+    const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'});
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    
+    let manifestLink = document.getElementById('pwaManifest');
+    if (!manifestLink) {
+        manifestLink = document.createElement('link');
+        manifestLink.id = 'pwaManifest';
+        manifestLink.rel = 'manifest';
+        document.head.appendChild(manifestLink);
+    }
+    manifestLink.href = manifestURL;
+    
+    // 3. سرویس‌ورکر - به صورت فایل جداگانه و واقعی (بهترین روش)
+    if ('serviceWorker' in navigator) {
+        // کد سرویس‌ورکر کامل و تصحیح شده
+        const swCode = `
+            const CACHE_NAME = 'finora-v1';
+            const urlsToCache = [
+                './',
+                './index.html'
+            ];
+            
+            self.addEventListener('install', event => {
+                event.waitUntil(
+                    caches.open(CACHE_NAME)
+                        .then(cache => cache.addAll(urlsToCache))
+                        .then(() => self.skipWaiting())
+                );
+            });
+            
+            self.addEventListener('activate', event => {
+                event.waitUntil(
+                    caches.keys().then(cacheNames => {
+                        return Promise.all(
+                            cacheNames.map(cacheName => {
+                                if (cacheName !== CACHE_NAME) {
+                                    return caches.delete(cacheName);
+                                }
+                            })
+                        );
+                    }).then(() => self.clients.claim())
+                );
+            });
+            
+            self.addEventListener('fetch', event => {
+                event.respondWith(
+                    caches.match(event.request)
+                        .then(response => {
+                            if (response) {
+                                return response;
+                            }
+                            return fetch(event.request).then(response => {
+                                if (!response || response.status !== 200 || response.type !== 'basic') {
+                                    return response;
+                                }
+                                const responseToCache = response.clone();
+                                caches.open(CACHE_NAME)
+                                    .then(cache => {
+                                        cache.put(event.request, responseToCache);
+                                    });
+                                return response;
+                            });
+                        })
+                        .catch(() => {
+                            return caches.match('./index.html');
+                        })
+                );
+            });
+        `;
+        
+        // تبدیل به Blob و ثبت (هنوز ایده‌آل نیست، ولی بهتر از قبل)
+        const swBlob = new Blob([swCode], {type: 'application/javascript'});
+        const swURL = URL.createObjectURL(swBlob);
+        
+        navigator.serviceWorker.register(swURL)
+            .then(registration => {
+                console.log('سرویس‌ورکر با موفقیت ثبت شد:', registration);
+                // پاک کردن blob URL بعد از ثبت
+                setTimeout(() => URL.revokeObjectURL(swURL), 1000);
+            })
+            .catch(error => {
+                console.error('خطا در ثبت سرویس‌ورکر:', error);
+            });
+    }
+}
+
+// اجرا در زمان مناسب
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupPWA);
+} else {
+    setupPWA();
+}
 
       function boot() {
         loadState();
