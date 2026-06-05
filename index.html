@@ -770,8 +770,8 @@
     .transaction-modal{
       width:100%;
       max-width:560px;
-      padding:10px 20px 28px;
-      border-radius:32px 32px 0 0;
+      padding:20px 20px 28px;
+      border-radius:32px;
       animation:modalIn .3s cubic-bezier(.22,.68,0,1.15);
       max-height:90vh;
       overflow-y:auto;
@@ -782,12 +782,12 @@
       flex-direction:column;
     }
     .transaction-modal::-webkit-scrollbar{display:none}
-    .modal-drag-handle{
+    /* .modal-drag-handle{
       width:44px;height:5px;border-radius:99px;
       background:rgba(255,255,255,.15);
       margin:8px auto 18px;
       flex:0 0 auto;
-    }
+    } */
     .modal-subtitle{color:var(--muted);font-size:.87rem;margin-top:3px}
 
     .price-desc-enter{
@@ -3675,7 +3675,7 @@
 
   <div class="modal-overlay" id="transactionModal" aria-hidden="true">
     <div class="glass transaction-modal">
-      <div class="modal-drag-handle"></div>
+      <!-- <div class="modal-drag-handle"></div> -->
       <div class="modal-head">
         <div>
           <div class="modal-title">ثبت تراکنش</div>
@@ -5090,21 +5090,21 @@ function parseMoneyInput(value) {
 
       // ══ HEALTH SCORE ═══════════════════════════════════════════
       function calcHealthScore(snap) {
-        // Factor 1: Savings rate (0-35pts) — income vs expense
         const income  = snap.currentIncomeTotal;
         const expense = snap.currentExpenseTotal;
-        let savingsScore = 0;
+        const hasTransactions = income > 0 || expense > 0;
+
+        // Factor 1: Savings rate (0-35pts) — only meaningful when income > 0
+        let savingsScore = null;
         if (income > 0) {
           const savingsRate = Math.max(0, (income - expense) / income);
           savingsScore = Math.round(Math.min(savingsRate * 2, 1) * 35);
-        } else if (expense === 0) {
-          savingsScore = 20; // neutral — no data yet
         }
 
-        // Factor 2: Budget adherence (0-35pts) — projected vs balance
+        // Factor 2: Budget adherence (0-35pts) — only when budgetBase > 0 and has data
         const budgetBase = Math.max(0, activeInitialBalance() + income);
-        let budgetScore = 35;
-        if (budgetBase > 0) {
+        let budgetScore = null;
+        if (budgetBase > 0 && hasTransactions) {
           const usedPct = expense / budgetBase;
           if (usedPct >= 1)       budgetScore = 0;
           else if (usedPct >= .9) budgetScore = 8;
@@ -5113,19 +5113,40 @@ function parseMoneyInput(value) {
           else                    budgetScore = 35;
         }
 
-        // Factor 3: Expense trend vs last month (0-30pts)
-        let trendScore = 15; // neutral default
+        // Factor 3: Expense trend (0-30pts)
+        // null        → no current expenses either → truly no data
+        // baseline 15 → first month recording (no prev to compare)
+        // calculated  → prev month has data
+        let trendScore = null;
+        let trendIsBaseline = false;
         if (snap.prevExpenseTotal > 0) {
-          const delta = snap.diffPct; // negative = improvement
+          const delta = snap.diffPct;
           if (delta <= -20)      trendScore = 30;
           else if (delta <= -5)  trendScore = 24;
           else if (delta <= 5)   trendScore = 18;
           else if (delta <= 20)  trendScore = 10;
           else                   trendScore = 4;
+        } else if (expense > 0) {
+          trendScore = 15;
+          trendIsBaseline = true;
         }
 
-        const total = Math.min(100, savingsScore + budgetScore + trendScore);
-        return { total, savingsScore, budgetScore, trendScore, savingsRate: income > 0 ? (income-expense)/income : 0 };
+        // Total: proportional across available (non-null) factors only
+        const hasData = [savingsScore, budgetScore, trendScore].some(s => s !== null);
+        let total = null;
+        if (hasData) {
+          const earned  = (savingsScore ?? 0) + (budgetScore ?? 0) + (trendScore ?? 0);
+          const maxAvail = (savingsScore !== null ? 35 : 0)
+                         + (budgetScore  !== null ? 35 : 0)
+                         + (trendScore   !== null ? 30 : 0);
+          total = maxAvail > 0 ? Math.round((earned / maxAvail) * 100) : null;
+        }
+
+        return {
+          total, hasData,
+          savingsScore, budgetScore, trendScore, trendIsBaseline,
+          savingsRate: income > 0 ? (income - expense) / income : null
+        };
       }
 
       function healthLabel(score) {
@@ -5147,8 +5168,7 @@ function parseMoneyInput(value) {
 
         const snap   = buildFinancialSnapshot(new Date());
         const scores = calcHealthScore(snap);
-        const { total, savingsScore, budgetScore, trendScore } = scores;
-        const lbl    = healthLabel(total);
+        const { total, hasData, savingsScore, budgetScore, trendScore, trendIsBaseline } = scores;
 
         if (dateEl) {
           const { jy, jm } = getJalaliDateParts(new Date());
@@ -5176,47 +5196,43 @@ function parseMoneyInput(value) {
         ctx.lineCap   = 'round';
         ctx.stroke();
 
-        // colored fill — animated
-        const targetAngle = startAngle + (total / 100) * Math.PI;
-        const startT = performance.now();
-        const DUR = 1000;
+        if (!hasData) {
+          // No data — empty gauge, show placeholder text
+          if (scoreEl) scoreEl.textContent = '--';
+          if (labelEl) { labelEl.textContent = 'محاسبه نشده'; labelEl.style.color = 'var(--muted)'; }
+        } else {
+          const lbl = healthLabel(total);
 
-        function drawArc(prog) {
-          const eased  = 1 - Math.pow(1 - prog, 3);
-          const current = startAngle + eased * (total / 100) * Math.PI;
-          // gradient along arc — green→yellow→red based on score
-          const grad = ctx.createLinearGradient(cx - R, cy, cx + R, cy);
-          grad.addColorStop(0,   '#ff5d7d');
-          grad.addColorStop(0.5, '#ffb84d');
-          grad.addColorStop(1,   '#18e6a6');
-          ctx.beginPath();
-          ctx.arc(cx, cy, R, startAngle, current);
-          ctx.strokeStyle = lbl.color;
-          ctx.lineWidth   = thickness;
-          ctx.lineCap     = 'round';
-          ctx.stroke();
-          // score number count-up
-          if (scoreEl) scoreEl.textContent = toPersianNumber(Math.round(total * eased));
-        }
+          const startT = performance.now();
+          const DUR = 1000;
 
-        function animGauge(now) {
-          ctx.clearRect(0, 0, W, H);
-          // redraw bg arc
-          ctx.beginPath();
-          ctx.arc(cx, cy, R, startAngle, endAngle);
-          ctx.strokeStyle = document.body.classList.contains('light-mode')
-            ? 'rgba(15,23,42,.08)' : 'rgba(255,255,255,.08)';
-          ctx.lineWidth = thickness; ctx.lineCap = 'round'; ctx.stroke();
-          const prog = Math.min((now - startT) / DUR, 1);
-          drawArc(prog);
-          if (prog < 1) requestAnimationFrame(animGauge);
-          else {
-            if (scoreEl) scoreEl.textContent = toPersianNumber(total);
+          function drawArc(prog) {
+            const eased = 1 - Math.pow(1 - prog, 3);
+            ctx.beginPath();
+            ctx.arc(cx, cy, R, startAngle, startAngle + eased * (total / 100) * Math.PI);
+            ctx.strokeStyle = lbl.color;
+            ctx.lineWidth   = thickness;
+            ctx.lineCap     = 'round';
+            ctx.stroke();
+            if (scoreEl) scoreEl.textContent = toPersianNumber(Math.round(total * eased));
           }
-        }
-        requestAnimationFrame(animGauge);
 
-        if (labelEl) { labelEl.textContent = lbl.text; labelEl.style.color = lbl.color; }
+          function animGauge(now) {
+            ctx.clearRect(0, 0, W, H);
+            ctx.beginPath();
+            ctx.arc(cx, cy, R, startAngle, endAngle);
+            ctx.strokeStyle = document.body.classList.contains('light-mode')
+              ? 'rgba(15,23,42,.08)' : 'rgba(255,255,255,.08)';
+            ctx.lineWidth = thickness; ctx.lineCap = 'round'; ctx.stroke();
+            const prog = Math.min((now - startT) / DUR, 1);
+            drawArc(prog);
+            if (prog < 1) requestAnimationFrame(animGauge);
+            else if (scoreEl) scoreEl.textContent = toPersianNumber(total);
+          }
+          requestAnimationFrame(animGauge);
+
+          if (labelEl) { labelEl.textContent = lbl.text; labelEl.style.color = lbl.color; }
+        }
 
         // ── factor bars ──
         const factors = [
@@ -5226,16 +5242,26 @@ function parseMoneyInput(value) {
         ];
         if (factorsEl) {
           factorsEl.style.gridTemplateColumns = 'repeat(3,1fr)';
-          factorsEl.innerHTML = factors.map(f => `
+          factorsEl.innerHTML = factors.map(f => {
+            const noData    = f.score === null;
+            const isBase    = f.name === 'روند هزینه' && trendIsBaseline;
+            const pct       = noData ? 0 : (f.score / f.max) * 100;
+            const scoreLabel = noData
+              ? `<span style="color:var(--muted)">--/${toPersianNumber(f.max)}</span>`
+              : isBase
+                ? `<span style="color:var(--muted);font-size:.75rem">اولین ماه</span>`
+                : `<span class="health-factor-score" style="color:${f.color}">${toPersianNumber(f.score)}/${toPersianNumber(f.max)}</span>`;
+            return `
             <div class="health-factor">
               <div class="health-factor-head">
                 <span>${f.name}</span>
-                <span class="health-factor-score" style="color:${f.color}">${toPersianNumber(f.score)}/${toPersianNumber(f.max)}</span>
+                ${scoreLabel}
               </div>
               <div class="health-factor-bar">
-                <div class="health-factor-fill" style="width:0%;background:${f.color}" data-w="${(f.score/f.max)*100}"></div>
+                <div class="health-factor-fill" style="width:0%;background:${noData ? 'rgba(255,255,255,.15)' : f.color};opacity:${isBase ? '.45' : '1'}" data-w="${pct}"></div>
               </div>
-            </div>`).join('');
+            </div>`;
+          }).join('');
           requestAnimationFrame(() => requestAnimationFrame(() => {
             factorsEl.querySelectorAll('.health-factor-fill').forEach(el => {
               el.style.width = el.dataset.w + '%';
@@ -5245,26 +5271,33 @@ function parseMoneyInput(value) {
 
         // ── tips ──
         const tips = [];
-        const { savingsRate, } = scores;
         const budgetBase = Math.max(0, activeInitialBalance() + snap.currentIncomeTotal);
 
         if (snap.currentIncomeTotal === 0 && snap.currentExpenseTotal === 0) {
           tips.push({ type:'warn', icon:'fa-circle-info', text:'هنوز تراکنشی ثبت نشده. برای محاسبه دقیق‌تر، درآمد و هزینه‌هات رو ثبت کن.' });
         } else {
-          if (savingsScore >= 28)
-            tips.push({ type:'good', icon:'fa-circle-check', text:'نسبت پس‌انداز خوبیه. ادامه بده!' });
-          else if (snap.currentIncomeTotal > 0)
-            tips.push({ type:'bad', icon:'fa-circle-exclamation', text:`هزینه‌هات ${Math.round((snap.currentExpenseTotal/snap.currentIncomeTotal)*100)}٪ درآمدته. سعی کن زیر ۷۰٪ نگه داری.` });
+          if (savingsScore !== null) {
+            if (savingsScore >= 28)
+              tips.push({ type:'good', icon:'fa-circle-check', text:'نسبت پس‌انداز خوبیه. ادامه بده!' });
+            else if (snap.currentIncomeTotal > 0)
+              tips.push({ type:'bad', icon:'fa-circle-exclamation', text:`هزینه‌هات ${toPersianNumber(Math.round((snap.currentExpenseTotal/snap.currentIncomeTotal)*100))}٪ درآمدته. سعی کن زیر ۷۰٪ نگه داری.` });
+          }
 
-          if (budgetScore >= 28)
-            tips.push({ type:'good', icon:'fa-circle-check', text:'بودجه‌ات رو خوب کنترل کردی.' });
-          else if (budgetBase > 0)
-            tips.push({ type:'warn', icon:'fa-triangle-exclamation', text:`بیش از ${Math.round((snap.currentExpenseTotal/budgetBase)*100)}٪ بودجه مصرف شده. مراقب هزینه‌های غیرضروری باش.` });
+          if (budgetScore !== null) {
+            if (budgetScore >= 28)
+              tips.push({ type:'good', icon:'fa-circle-check', text:'بودجه‌ات رو خوب کنترل کردی.' });
+            else if (budgetBase > 0)
+              tips.push({ type:'warn', icon:'fa-triangle-exclamation', text:`بیش از ${toPersianNumber(Math.round((snap.currentExpenseTotal/budgetBase)*100))}٪ بودجه مصرف شده. مراقب هزینه‌های غیرضروری باش.` });
+          }
 
-          if (trendScore >= 24)
-            tips.push({ type:'good', icon:'fa-arrow-trend-down', text:'هزینه‌هات نسبت به ماه قبل کمتر شده. عالی!' });
-          else if (trendScore <= 8 && snap.prevExpenseTotal > 0)
-            tips.push({ type:'bad', icon:'fa-arrow-trend-up', text:`هزینه‌هات ${Math.round(snap.diffPct)}٪ بیشتر از ماه قبله. بررسی کن کجا زیاده‌روی شده.` });
+          if (trendScore !== null) {
+            if (trendIsBaseline)
+              tips.push({ type:'warn', icon:'fa-clock', text:'اولین ماه ثبت هزینه‌ست. از ماه بعد روند مقایسه‌ای محاسبه می‌شه.' });
+            else if (trendScore >= 24)
+              tips.push({ type:'good', icon:'fa-arrow-trend-down', text:'هزینه‌هات نسبت به ماه قبل کمتر شده. عالی!' });
+            else if (trendScore <= 8)
+              tips.push({ type:'bad', icon:'fa-arrow-trend-up', text:`هزینه‌هات ${toPersianNumber(Math.round(snap.diffPct))}٪ بیشتر از ماه قبله. بررسی کن کجا زیاده‌روی شده.` });
+          }
         }
 
         if (tipsEl) {
