@@ -8183,10 +8183,12 @@ function renderCalendarView() {
       }
     });
 
-    let currentUser = null;
-    let syncTimeout = null;
-    let isLoading = false;   // ← جلوگیری از loop هنگام loadFromSupabase
-    let bootCalled = false;  // ← boot فقط یکبار صدا زده بشه
+    let currentUser     = null;
+    let syncTimeout     = null;
+    let pullTimeout     = null;
+    let isLoading       = false;
+    let isSaving        = false;
+    let bootCalled      = false;
     let realtimeChannel = null;
 
     /* ── DOM refs ── */
