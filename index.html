@@ -8273,9 +8273,9 @@ function renderCalendarView() {
     }
 
     /* ══════════════════════════════════════════════
-       AUTH STATE — فقط یکبار boot، session پایدار
+       AUTH STATE
     ══════════════════════════════════════════════ */
-    sb.auth.onAuthStateChange(async (event, session) => {
+    async function handleSession(session) {
       if (session?.user) {
         currentUser = session.user;
         authOverlay.classList.add('hidden');
@@ -8287,8 +8287,7 @@ function renderCalendarView() {
           bootCalled = true;
           if (typeof window.boot === 'function') window.boot();
         } else {
-          // دستگاه قبلاً boot شده — فقط UI رو refresh کن
-          if (typeof window.renderAll === 'function') window.renderAll();
+          if (typeof window.reloadStateAndRender === 'function') window.reloadStateAndRender();
         }
 
         startRealtime();
@@ -8298,6 +8297,18 @@ function renderCalendarView() {
         stopRealtime();
         authOverlay.classList.remove('hidden');
       }
+    }
+
+    // بررسی session موجود در لحظه لود (بدون انتظار برای event)
+    sb.auth.getSession().then(({ data: { session } }) => {
+      handleSession(session);
+    });
+
+    // گوش دادن به تغییرات بعدی (login, logout, token refresh)
+    sb.auth.onAuthStateChange(async (event, session) => {
+      // INITIAL_SESSION رو skip کن چون getSession() اون رو handle کرده
+      if (event === 'INITIAL_SESSION') return;
+      await handleSession(session);
     });
 
     /* ══════════════════════════
