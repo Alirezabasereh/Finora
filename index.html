@@ -8150,27 +8150,15 @@ function renderCalendarView() {
       window.boot            = boot;
       window.renderAll       = renderAll;
       window.syncProfileToUI = syncProfileToUI;
-
-      // reloadStateAndRender: برای realtime sync — state رو از localStorage می‌خونه و همه UI رو refresh می‌کنه
-      window.reloadStateAndRender = function() {
-        loadState();   // خوندن مجدد از localStorage
-        renderAll();   // رندر کردن همه صفحات
-        syncProfileToUI(); // آپدیت پروفایل
-      };
     })();
   </script>
   <script>
   /* ══════════════════════════════════════════
-     FINORA × SUPABASE  —  Auth + Sync Layer v3
-     fixes: orig setItem captured before override,
-            pullAndRefresh re-renders app state,
-            isLoading stuck prevention
+     FINORA × SUPABASE  —  Auth + Sync Layer v2
+     fixes: infinite loop, realtime, session persist
   ══════════════════════════════════════════ */
   (() => {
     'use strict';
-
-    // مهم: قبل از هر override، نسخه اصلی رو ذخیره کن
-    const _origSetItem = localStorage.setItem.bind(localStorage);
 
     const SUPABASE_URL = 'https://xqibpsageodzkisabzbh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxaWJwc2FnZW9kemtpc2FiemJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NTMzMTQsImV4cCI6MjA5ODEyOTMxNH0.4fyLHKq-Opf_uqTa4_8nHoofHjry0l52752QCsMlxy8';
@@ -8183,12 +8171,10 @@ function renderCalendarView() {
       }
     });
 
-    let currentUser     = null;
-    let syncTimeout     = null;
-    let pullTimeout     = null;
-    let isLoading       = false;
-    let isSaving        = false;
-    let bootCalled      = false;
+    let currentUser = null;
+    let syncTimeout = null;
+    let isLoading = false;   // ← جلوگیری از loop هنگام loadFromSupabase
+    let bootCalled = false;  // ← boot فقط یکبار صدا زده بشه
     let realtimeChannel = null;
 
     /* ── DOM refs ── */
@@ -8275,9 +8261,9 @@ function renderCalendarView() {
     }
 
     /* ══════════════════════════════════════════════
-       AUTH STATE
+       AUTH STATE — فقط یکبار boot، session پایدار
     ══════════════════════════════════════════════ */
-    async function handleSession(session) {
+    sb.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         currentUser = session.user;
         authOverlay.classList.add('hidden');
@@ -8289,7 +8275,8 @@ function renderCalendarView() {
           bootCalled = true;
           if (typeof window.boot === 'function') window.boot();
         } else {
-          if (typeof window.reloadStateAndRender === 'function') window.reloadStateAndRender();
+          // دستگاه قبلاً boot شده — فقط UI رو refresh کن
+          if (typeof window.renderAll === 'function') window.renderAll();
         }
 
         startRealtime();
@@ -8299,18 +8286,6 @@ function renderCalendarView() {
         stopRealtime();
         authOverlay.classList.remove('hidden');
       }
-    }
-
-    // بررسی session موجود در لحظه لود (بدون انتظار برای event)
-    sb.auth.getSession().then(({ data: { session } }) => {
-      handleSession(session);
-    });
-
-    // گوش دادن به تغییرات بعدی (login, logout, token refresh)
-    sb.auth.onAuthStateChange(async (event, session) => {
-      // INITIAL_SESSION رو skip کن چون getSession() اون رو handle کرده
-      if (event === 'INITIAL_SESSION') return;
-      await handleSession(session);
     });
 
     /* ══════════════════════════
@@ -8336,7 +8311,7 @@ function renderCalendarView() {
       showSync('syncing', '⏳ در حال بارگذاری اطلاعات...');
       try {
         const uid = currentUser.id;
-        const orig = _origSetItem; // نسخه اصلی قبل از override
+        const orig = localStorage.setItem.bind(localStorage);
 
         // Profile
         const { data: prof } = await sb.from('profiles').select('*').eq('id', uid).single();
@@ -8396,7 +8371,6 @@ function renderCalendarView() {
         console.error('Load error:', err);
         showSync('error', '❌ خطا در بارگذاری اطلاعات');
       } finally {
-        clearTimeout(loadingGuard);
         isLoading = false;
       }
     }
@@ -8405,8 +8379,7 @@ function renderCalendarView() {
        SAVE TO SUPABASE
     ══════════════════════════ */
     async function saveToSupabase() {
-      if (!currentUser || isLoading || isSaving) return;
-      isSaving = true;
+      if (!currentUser || isLoading) return;
       const uid = currentUser.id;
       showSync('syncing', '☁️ در حال ذخیره...');
       try {
@@ -8504,8 +8477,6 @@ function renderCalendarView() {
       } catch(err) {
         console.error('Save error:', err);
         showSync('error', '❌ خطا در ذخیره‌سازی');
-      } finally {
-        isSaving = false;
       }
     }
 
@@ -8538,17 +8509,14 @@ function renderCalendarView() {
       }
     }
 
+    let pullTimeout = null;
     async function pullAndRefresh() {
+      // debounce — اگه چند تا تغییر پشت هم بیان، فقط یکبار pull کن
       clearTimeout(pullTimeout);
       pullTimeout = setTimeout(async () => {
         showSync('syncing', '🔄 دستگاه دیگری داده را تغییر داد...');
         await loadFromSupabase();
-        // state اپ رو از localStorage بخون و UI رو کامل refresh کن
-        if (typeof window.reloadStateAndRender === 'function') {
-          window.reloadStateAndRender();
-        } else if (typeof window.renderAll === 'function') {
-          window.renderAll();
-        }
+        if (typeof window.renderAll === 'function') window.renderAll();
         if (typeof window.syncProfileToUI === 'function') window.syncProfileToUI();
         showSync('saved', '✅ همگام‌سازی شد');
       }, 800);
@@ -8558,6 +8526,7 @@ function renderCalendarView() {
        HOOK localStorage.setItem
        isLoading=true → skip (جلوگیری از loop)
     ══════════════════════════════════════════════ */
+    const _origSetItem = localStorage.setItem.bind(localStorage);
     localStorage.setItem = function(key, value) {
       _origSetItem(key, value);
       if (isLoading) return; // ← کلید اصلی: موقع load، save trigger نمی‌شه
