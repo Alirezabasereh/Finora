@@ -8147,12 +8147,15 @@ function renderCalendarView() {
       }
 
       // Expose boot to window so Supabase auth script can call it
-      window.boot = boot;
+      window.boot            = boot;
+      window.renderAll       = renderAll;
+      window.syncProfileToUI = syncProfileToUI;
     })();
   </script>
   <script>
   /* ══════════════════════════════════════════
-     FINORA × SUPABASE  —  Auth + Sync Layer
+     FINORA × SUPABASE  —  Auth + Sync Layer v2
+     fixes: infinite loop, realtime, session persist
   ══════════════════════════════════════════ */
   (() => {
     'use strict';
@@ -8160,10 +8163,19 @@ function renderCalendarView() {
     const SUPABASE_URL = 'https://xqibpsageodzkisabzbh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxaWJwc2FnZW9kemtpc2FiemJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NTMzMTQsImV4cCI6MjA5ODEyOTMxNH0.4fyLHKq-Opf_uqTa4_8nHoofHjry0l52752QCsMlxy8';
 
-    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        storageKey: 'finora_sb_session'
+      }
+    });
 
     let currentUser = null;
     let syncTimeout = null;
+    let isLoading = false;   // ← جلوگیری از loop هنگام loadFromSupabase
+    let bootCalled = false;  // ← boot فقط یکبار صدا زده بشه
+    let realtimeChannel = null;
 
     /* ── DOM refs ── */
     const authOverlay      = document.getElementById('authOverlay');
@@ -8234,7 +8246,6 @@ function renderCalendarView() {
         showError(registerError, translateAuthError(error.message));
       } else {
         showSuccess(registerSuccess, '✅ ثبت‌نام موفق! لطفاً وارد حساب خود شوید.');
-        // switch to login tab
         setTimeout(() => { tabLogin.click(); }, 1500);
       }
     });
@@ -8243,21 +8254,36 @@ function renderCalendarView() {
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async () => {
         if (!confirm('از حساب کاربری خارج می‌شوید؟')) return;
+        stopRealtime();
+        bootCalled = false;
         await sb.auth.signOut();
       });
     }
 
-    /* ── Auth state changes ── */
+    /* ══════════════════════════════════════════════
+       AUTH STATE — فقط یکبار boot، session پایدار
+    ══════════════════════════════════════════════ */
     sb.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         currentUser = session.user;
         authOverlay.classList.add('hidden');
         if (profileUserEmail) profileUserEmail.textContent = currentUser.email;
+
         await loadFromSupabase();
-        // Call the app's boot function
-        if (typeof boot === 'function') boot();
+
+        if (!bootCalled) {
+          bootCalled = true;
+          if (typeof window.boot === 'function') window.boot();
+        } else {
+          // دستگاه قبلاً boot شده — فقط UI رو refresh کن
+          if (typeof window.renderAll === 'function') window.renderAll();
+        }
+
+        startRealtime();
       } else {
         currentUser = null;
+        bootCalled = false;
+        stopRealtime();
         authOverlay.classList.remove('hidden');
       }
     });
@@ -8274,82 +8300,78 @@ function renderCalendarView() {
       }
     }
 
-    /* ══════════════════════════
+    /* ══════════════════════════════════════════════
        LOAD FROM SUPABASE
-    ══════════════════════════ */
+       isLoading=true جلوگیری می‌کنه از trigger شدن
+       localStorage.setItem override حین لود
+    ══════════════════════════════════════════════ */
     async function loadFromSupabase() {
       if (!currentUser) return;
+      isLoading = true;
       showSync('syncing', '⏳ در حال بارگذاری اطلاعات...');
       try {
         const uid = currentUser.id;
+        const orig = localStorage.setItem.bind(localStorage);
 
         // Profile
         const { data: prof } = await sb.from('profiles').select('*').eq('id', uid).single();
         if (prof) {
-          localStorage.setItem('finora_initial_balance', String(prof.initial_balance || 0));
-          localStorage.setItem('finora_theme', prof.theme || 'dark');
-          const profileObj = {
+          orig('finora_initial_balance', String(prof.initial_balance || 0));
+          orig('finora_theme', prof.theme || 'dark');
+          orig('finora_profile', JSON.stringify({
             name: prof.name || 'کاربر',
             avatarMode: prof.avatar_mode || 'upload',
             avatarIndex: prof.avatar_index ?? -1,
             avatar: prof.avatar_data || ''
-          };
-          localStorage.setItem('finora_profile', JSON.stringify(profileObj));
+          }));
         }
 
         // Transactions
         const { data: txs } = await sb.from('transactions').select('*').eq('user_id', uid);
-        if (Array.isArray(txs) && txs.length) {
-          const mapped = txs.map(t => ({
-            id: t.id, type: t.type, amount: t.amount,
-            category: t.category, note: t.note, createdAt: t.created_at
-          }));
-          localStorage.setItem('finora_transactions', JSON.stringify(mapped));
+        if (Array.isArray(txs)) {
+          orig('finora_transactions', JSON.stringify(
+            txs.map(t => ({ id:t.id, type:t.type, amount:t.amount, category:t.category, note:t.note, createdAt:t.created_at }))
+          ));
         }
 
         // Categories
         const { data: cats } = await sb.from('categories').select('*').eq('user_id', uid);
         if (Array.isArray(cats) && cats.length) {
-          const mapped = cats.map(c => ({
-            id: c.id, key: c.key, label: c.label,
-            icon: c.icon, color: c.color, type: c.type, builtin: c.builtin
-          }));
-          localStorage.setItem('finora_categories', JSON.stringify(mapped));
+          orig('finora_categories', JSON.stringify(
+            cats.map(c => ({ id:c.id, key:c.key, label:c.label, icon:c.icon, color:c.color, type:c.type, builtin:c.builtin }))
+          ));
         }
 
         // Goals
         const { data: goals } = await sb.from('goals').select('*').eq('user_id', uid);
-        if (Array.isArray(goals) && goals.length) {
-          const mapped = goals.map(g => ({
-            id: g.id, name: g.name, target: g.target,
-            saved: g.saved, icon: g.icon, color: g.color, createdAt: g.created_at
-          }));
-          localStorage.setItem('finora_goals', JSON.stringify(mapped));
+        if (Array.isArray(goals)) {
+          orig('finora_goals', JSON.stringify(
+            goals.map(g => ({ id:g.id, name:g.name, target:g.target, saved:g.saved, icon:g.icon, color:g.color, createdAt:g.created_at }))
+          ));
         }
 
         // Loans
         const { data: loans } = await sb.from('loans').select('*').eq('user_id', uid);
-        if (Array.isArray(loans) && loans.length) {
-          const mapped = loans.map(l => ({
-            id: l.id, person: l.person, amount: l.amount,
-            type: l.type, note: l.note, date: l.date,
-            paid: l.paid, createdAt: l.created_at
-          }));
-          localStorage.setItem('finora_loans', JSON.stringify(mapped));
+        if (Array.isArray(loans)) {
+          orig('finora_loans', JSON.stringify(
+            loans.map(l => ({ id:l.id, person:l.person, amount:l.amount, type:l.type, note:l.note, date:l.date, paid:l.paid, createdAt:l.created_at }))
+          ));
         }
 
         // Monthly Archive
         const { data: archive } = await sb.from('monthly_archive').select('*').eq('user_id', uid);
         if (Array.isArray(archive) && archive.length) {
-          const archiveObj = {};
-          archive.forEach(a => { archiveObj[a.month_key] = a.data; });
-          localStorage.setItem('finora_monthly_archive', JSON.stringify(archiveObj));
+          const obj = {};
+          archive.forEach(a => { obj[a.month_key] = a.data; });
+          orig('finora_monthly_archive', JSON.stringify(obj));
         }
 
         showSync('saved', '✅ اطلاعات بارگذاری شد');
       } catch(err) {
         console.error('Load error:', err);
         showSync('error', '❌ خطا در بارگذاری اطلاعات');
+      } finally {
+        isLoading = false;
       }
     }
 
@@ -8357,126 +8379,97 @@ function renderCalendarView() {
        SAVE TO SUPABASE
     ══════════════════════════ */
     async function saveToSupabase() {
-      if (!currentUser) return;
+      if (!currentUser || isLoading) return;
       const uid = currentUser.id;
       showSync('syncing', '☁️ در حال ذخیره...');
       try {
-        // Read from localStorage (app writes there first)
-        const txs       = safeParseJSON(localStorage.getItem('finora_transactions')) || [];
-        const cats      = safeParseJSON(localStorage.getItem('finora_categories')) || [];
-        const goals     = safeParseJSON(localStorage.getItem('finora_goals')) || [];
-        const loans     = safeParseJSON(localStorage.getItem('finora_loans')) || [];
-        const profile   = safeParseJSON(localStorage.getItem('finora_profile')) || {};
-        const initBal   = parseFloat(localStorage.getItem('finora_initial_balance') || '0');
-        const theme     = localStorage.getItem('finora_theme') || 'dark';
-        const archiveRaw = safeParseJSON(localStorage.getItem('finora_monthly_archive')) || {};
+        const txs      = safeJSON(localStorage.getItem('finora_transactions')) || [];
+        const cats     = safeJSON(localStorage.getItem('finora_categories')) || [];
+        const goals    = safeJSON(localStorage.getItem('finora_goals')) || [];
+        const loans    = safeJSON(localStorage.getItem('finora_loans')) || [];
+        const profile  = safeJSON(localStorage.getItem('finora_profile')) || {};
+        const initBal  = parseFloat(localStorage.getItem('finora_initial_balance') || '0');
+        const theme    = localStorage.getItem('finora_theme') || 'dark';
+        const archRaw  = safeJSON(localStorage.getItem('finora_monthly_archive')) || {};
 
-        // Profile upsert
+        // Profile
         await sb.from('profiles').upsert({
-          id: uid,
-          name: profile.name || 'کاربر',
-          avatar_mode: profile.avatarMode || 'upload',
-          avatar_index: profile.avatarIndex ?? -1,
-          avatar_data: profile.avatar || '',
-          initial_balance: initBal,
-          theme,
+          id: uid, name: profile.name||'کاربر',
+          avatar_mode: profile.avatarMode||'upload',
+          avatar_index: profile.avatarIndex??-1,
+          avatar_data: profile.avatar||'',
+          initial_balance: initBal, theme,
           updated_at: new Date().toISOString()
         });
 
-        // Transactions upsert
+        // Transactions — upsert all, then delete orphans
         if (txs.length) {
           await sb.from('transactions').upsert(
-            txs.map(t => ({
-              id: t.id, user_id: uid,
-              type: t.type, amount: t.amount,
-              category: t.category || null,
-              note: t.note || null,
-              created_at: t.createdAt || Date.now(),
-              updated_at: new Date().toISOString()
-            })),
-            { onConflict: 'id' }
+            txs.map(t => ({ id:t.id, user_id:uid, type:t.type, amount:t.amount,
+              category:t.category||null, note:t.note||null,
+              created_at:t.createdAt||Date.now(), updated_at:new Date().toISOString() })),
+            { onConflict:'id' }
           );
-          // Delete removed transactions
-          const { data: remoteTxs } = await sb.from('transactions').select('id').eq('user_id', uid);
-          if (remoteTxs) {
-            const localIds = new Set(txs.map(t => t.id));
-            const toDelete = remoteTxs.filter(r => !localIds.has(r.id)).map(r => r.id);
-            if (toDelete.length) await sb.from('transactions').delete().in('id', toDelete).eq('user_id', uid);
-          }
-        } else {
-          // All deleted locally — clear remote too
-          await sb.from('transactions').delete().eq('user_id', uid);
+        }
+        const { data: remoteTxs } = await sb.from('transactions').select('id').eq('user_id', uid);
+        if (remoteTxs) {
+          const localIds = new Set(txs.map(t => t.id));
+          const del = remoteTxs.filter(r => !localIds.has(r.id)).map(r => r.id);
+          if (del.length) await sb.from('transactions').delete().in('id', del).eq('user_id', uid);
         }
 
-        // Categories upsert (only custom, non-builtin)
-        const customCats = cats.filter(c => !c.builtin);
-        if (customCats.length) {
+        // Custom categories
+        const custom = cats.filter(c => !c.builtin);
+        if (custom.length) {
           await sb.from('categories').upsert(
-            customCats.map(c => ({
-              id: c.id || c.key + '_' + uid,
-              user_id: uid, key: c.key, label: c.label,
-              icon: c.icon, color: c.color, type: c.type,
-              builtin: false, updated_at: new Date().toISOString()
-            })),
-            { onConflict: 'id' }
+            custom.map(c => ({ id:c.id||c.key+'_'+uid, user_id:uid, key:c.key, label:c.label,
+              icon:c.icon, color:c.color, type:c.type, builtin:false,
+              updated_at:new Date().toISOString() })),
+            { onConflict:'id' }
           );
         }
 
-        // Goals upsert
+        // Goals
         if (goals.length) {
           await sb.from('goals').upsert(
-            goals.map(g => ({
-              id: g.id, user_id: uid,
-              name: g.name, target: g.target,
-              saved: g.saved || 0, icon: g.icon, color: g.color,
-              created_at: g.createdAt || Date.now(),
-              updated_at: new Date().toISOString()
-            })),
-            { onConflict: 'id' }
+            goals.map(g => ({ id:g.id, user_id:uid, name:g.name, target:g.target,
+              saved:g.saved||0, icon:g.icon, color:g.color,
+              created_at:g.createdAt||Date.now(), updated_at:new Date().toISOString() })),
+            { onConflict:'id' }
           );
-          const { data: remoteGoals } = await sb.from('goals').select('id').eq('user_id', uid);
-          if (remoteGoals) {
-            const localIds = new Set(goals.map(g => g.id));
-            const toDelete = remoteGoals.filter(r => !localIds.has(r.id)).map(r => r.id);
-            if (toDelete.length) await sb.from('goals').delete().in('id', toDelete).eq('user_id', uid);
-          }
-        } else {
-          await sb.from('goals').delete().eq('user_id', uid);
+        }
+        const { data: remoteGoals } = await sb.from('goals').select('id').eq('user_id', uid);
+        if (remoteGoals) {
+          const localIds = new Set(goals.map(g => g.id));
+          const del = remoteGoals.filter(r => !localIds.has(r.id)).map(r => r.id);
+          if (del.length) await sb.from('goals').delete().in('id', del).eq('user_id', uid);
         }
 
-        // Loans upsert
+        // Loans
         if (loans.length) {
           await sb.from('loans').upsert(
-            loans.map(l => ({
-              id: l.id, user_id: uid,
-              person: l.person, amount: l.amount,
-              type: l.type, note: l.note || null, date: l.date || null,
-              paid: l.paid || false,
-              created_at: l.createdAt || Date.now(),
-              updated_at: new Date().toISOString()
-            })),
-            { onConflict: 'id' }
+            loans.map(l => ({ id:l.id, user_id:uid, person:l.person, amount:l.amount,
+              type:l.type, note:l.note||null, date:l.date||null, paid:l.paid||false,
+              created_at:l.createdAt||Date.now(), updated_at:new Date().toISOString() })),
+            { onConflict:'id' }
           );
-          const { data: remoteLoans } = await sb.from('loans').select('id').eq('user_id', uid);
-          if (remoteLoans) {
-            const localIds = new Set(loans.map(l => l.id));
-            const toDelete = remoteLoans.filter(r => !localIds.has(r.id)).map(r => r.id);
-            if (toDelete.length) await sb.from('loans').delete().in('id', toDelete).eq('user_id', uid);
-          }
-        } else {
-          await sb.from('loans').delete().eq('user_id', uid);
+        }
+        const { data: remoteLoans } = await sb.from('loans').select('id').eq('user_id', uid);
+        if (remoteLoans) {
+          const localIds = new Set(loans.map(l => l.id));
+          const del = remoteLoans.filter(r => !localIds.has(r.id)).map(r => r.id);
+          if (del.length) await sb.from('loans').delete().in('id', del).eq('user_id', uid);
         }
 
-        // Monthly Archive upsert
-        const archiveEntries = Object.entries(archiveRaw);
-        if (archiveEntries.length) {
+        // Archive
+        const archEntries = Object.entries(archRaw);
+        if (archEntries.length) {
           await sb.from('monthly_archive').upsert(
-            archiveEntries.map(([key, data]) => ({
-              id: uid + '_' + key,
-              user_id: uid, month_key: key,
-              data, updated_at: new Date().toISOString()
+            archEntries.map(([key, data]) => ({
+              id: uid+'_'+key, user_id:uid, month_key:key,
+              data, updated_at:new Date().toISOString()
             })),
-            { onConflict: 'id' }
+            { onConflict:'id' }
           );
         }
 
@@ -8487,57 +8480,93 @@ function renderCalendarView() {
       }
     }
 
-    function safeParseJSON(raw) {
-      try { return JSON.parse(raw); } catch { return null; }
+    /* ══════════════════════════════════════════════
+       REALTIME — وقتی دستگاه دیگه چیزی تغییر داد
+       اطلاعات pull می‌شه و UI آپدیت می‌شه
+    ══════════════════════════════════════════════ */
+    function startRealtime() {
+      if (realtimeChannel) return;
+      const uid = currentUser?.id;
+      if (!uid) return;
+
+      realtimeChannel = sb
+        .channel('finora_sync_' + uid)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: 'user_id=eq.' + uid },
+          () => pullAndRefresh())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'goals', filter: 'user_id=eq.' + uid },
+          () => pullAndRefresh())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'loans', filter: 'user_id=eq.' + uid },
+          () => pullAndRefresh())
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: 'id=eq.' + uid },
+          () => pullAndRefresh())
+        .subscribe();
     }
 
-    /* ══════════════════════════
-       DEBOUNCED AUTO-SAVE
-       Hook into localStorage writes
-    ══════════════════════════ */
+    function stopRealtime() {
+      if (realtimeChannel) {
+        sb.removeChannel(realtimeChannel);
+        realtimeChannel = null;
+      }
+    }
+
+    let pullTimeout = null;
+    async function pullAndRefresh() {
+      // debounce — اگه چند تا تغییر پشت هم بیان، فقط یکبار pull کن
+      clearTimeout(pullTimeout);
+      pullTimeout = setTimeout(async () => {
+        showSync('syncing', '🔄 دستگاه دیگری داده را تغییر داد...');
+        await loadFromSupabase();
+        if (typeof window.renderAll === 'function') window.renderAll();
+        if (typeof window.syncProfileToUI === 'function') window.syncProfileToUI();
+        showSync('saved', '✅ همگام‌سازی شد');
+      }, 800);
+    }
+
+    /* ══════════════════════════════════════════════
+       HOOK localStorage.setItem
+       isLoading=true → skip (جلوگیری از loop)
+    ══════════════════════════════════════════════ */
     const _origSetItem = localStorage.setItem.bind(localStorage);
     localStorage.setItem = function(key, value) {
       _origSetItem(key, value);
-      // Only sync app data keys
+      if (isLoading) return; // ← کلید اصلی: موقع load، save trigger نمی‌شه
       if (key.startsWith('finora_') && key !== 'finora_last_seen_month' && currentUser) {
         clearTimeout(syncTimeout);
         syncTimeout = setTimeout(() => saveToSupabase(), 1500);
       }
     };
 
-    /* ══════════════════════════
-       RESET — also clear remote
-    ══════════════════════════ */
+    /* ── Reset — پاک کردن remote هم ── */
     document.addEventListener('click', async (e) => {
-      if (e.target && e.target.id === 'resetConfirmBtn') {
-        if (currentUser) {
-          const uid = currentUser.id;
-          await Promise.all([
-            sb.from('transactions').delete().eq('user_id', uid),
-            sb.from('categories').delete().eq('user_id', uid),
-            sb.from('goals').delete().eq('user_id', uid),
-            sb.from('loans').delete().eq('user_id', uid),
-            sb.from('monthly_archive').delete().eq('user_id', uid),
-            sb.from('profiles').update({
-              initial_balance: 0, name: 'کاربر',
-              avatar_data: '', avatar_mode: 'upload', avatar_index: -1
-            }).eq('id', uid)
-          ]);
-        }
+      if (e.target?.id === 'resetConfirmBtn' && currentUser) {
+        const uid = currentUser.id;
+        await Promise.all([
+          sb.from('transactions').delete().eq('user_id', uid),
+          sb.from('categories').delete().eq('user_id', uid),
+          sb.from('goals').delete().eq('user_id', uid),
+          sb.from('loans').delete().eq('user_id', uid),
+          sb.from('monthly_archive').delete().eq('user_id', uid),
+          sb.from('profiles').update({
+            initial_balance:0, name:'کاربر',
+            avatar_data:'', avatar_mode:'upload', avatar_index:-1
+          }).eq('id', uid)
+        ]);
       }
     }, true);
 
-    /* ── Error translator ── */
+    /* ── Helpers ── */
+    function safeJSON(raw) { try { return JSON.parse(raw); } catch { return null; } }
+
     function translateAuthError(msg) {
       if (msg.includes('Invalid login')) return 'ایمیل یا رمز عبور اشتباه است.';
-      if (msg.includes('Email not confirmed')) return 'ایمیل شما تأیید نشده. صندوق ورودی را بررسی کنید.';
+      if (msg.includes('Email not confirmed')) return 'ایمیل شما تأیید نشده.';
       if (msg.includes('User already registered')) return 'این ایمیل قبلاً ثبت‌نام شده است.';
       if (msg.includes('Password should be')) return 'رمز عبور باید حداقل ۶ کاراکتر باشد.';
-      if (msg.includes('rate limit')) return 'تعداد تلاش‌ها زیاد است. چند دقیقه صبر کنید.';
+      if (msg.includes('rate limit')) return 'تعداد تلاش زیاد است. کمی صبر کنید.';
       return msg;
     }
 
-    /* ── Enter key support ── */
+    /* ── Enter key ── */
     document.getElementById('loginPassword').addEventListener('keydown', e => {
       if (e.key === 'Enter') loginBtn.click();
     });
