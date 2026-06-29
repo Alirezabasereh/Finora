@@ -3007,7 +3007,173 @@
       50%{transform:scale(1.08); filter:drop-shadow(0 0 24px rgba(0,210,255,.35))}
     }
 
-    /* ensure completed goals no longer show add controls */
+    /* ══ LOANS ══════════════════════════════════════════════════ */
+    .loans-grid{ display:grid; gap:14px; margin-top:14px; }
+
+    .loan-card{
+      border-radius:26px;
+      padding:20px;
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+      transition:.22s ease;
+    }
+    .loan-card::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      opacity:0;
+      background:linear-gradient(135deg,rgba(106,92,255,.06),transparent 60%);
+      transition:.22s ease;
+      pointer-events:none;
+    }
+    .loan-card:hover::before{ opacity:1; }
+
+    /* accent glow blob in top-left corner */
+    .loan-card .loan-glow{
+      position:absolute;
+      top:-30px; right:-30px;
+      width:130px; height:130px;
+      border-radius:50%;
+      filter:blur(38px);
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .loan-card > *{ position:relative; z-index:1; }
+
+    /* ── header row ── */
+    .loan-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:16px;
+    }
+    .loan-title-row{ display:flex; flex-direction:column; gap:6px; }
+    .loan-title{ font-size:1.05rem; font-weight:900; line-height:1.2; }
+    .loan-status-badge{
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:.75rem; font-weight:700;
+      padding:3px 9px; border-radius:99px;
+    }
+    .loan-status-badge.active{
+      background:rgba(255,184,77,.14);
+      color:var(--warn);
+      border:1px solid rgba(255,184,77,.22);
+    }
+    .loan-status-badge.done{
+      background:rgba(24,230,166,.14);
+      color:var(--good);
+      border:1px solid rgba(24,230,166,.22);
+    }
+
+    /* ── stats row ── */
+    .loan-stats{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-bottom:18px;
+    }
+    .loan-stat{
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius:16px;
+      padding:11px 12px;
+      display:flex; flex-direction:column; gap:4px;
+    }
+    .loan-stat-label{ font-size:.72rem; color:var(--muted); line-height:1; }
+    .loan-stat-value{ font-size:.97rem; font-weight:800; line-height:1.2; }
+
+    /* ── progress section ── */
+    .loan-progress-head{
+      display:flex; justify-content:space-between;
+      align-items:center; margin-bottom:8px;
+      font-size:.82rem;
+    }
+    .loan-progress-head .paid-label{ color:var(--muted); }
+    .loan-progress-head .paid-pct{ font-weight:800; font-size:.95rem; }
+
+    .loan-progress-track{
+      width:100%; height:10px; border-radius:99px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden; margin-bottom:10px;
+      position:relative;
+    }
+    .loan-progress-fill{
+      height:100%; border-radius:99px;
+      transition:width .7s cubic-bezier(.22,.68,0,1.2);
+      position:relative;
+    }
+    .loan-progress-fill::after{
+      content:'';
+      position:absolute;
+      inset:0;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);
+      animation:shimmer 2.2s ease-in-out infinite;
+    }
+    @keyframes shimmer{
+      0%{ transform:translateX(-100%); }
+      100%{ transform:translateX(200%); }
+    }
+    .loan-progress-fill.done-fill::after{ display:none; }
+
+    .loan-amounts-row{
+      display:flex; justify-content:space-between;
+      font-size:.8rem; color:var(--muted);
+      margin-bottom:16px;
+    }
+    .loan-amounts-row strong{ color:var(--text); font-weight:700; }
+
+    /* ── action row ── */
+    .loan-action-row{
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:8px;
+      align-items:center;
+    }
+    .loan-installment-counter{
+      display:flex; align-items:center; gap:6px;
+    }
+    .loan-count-btn{
+      width:34px; height:34px; border-radius:11px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.1);
+      color:var(--text); font-size:1rem; font-weight:700;
+      display:grid; place-items:center;
+      transition:.15s ease;
+    }
+    .loan-count-btn:hover{ background:rgba(255,255,255,.15); }
+    .loan-count-btn:disabled{ opacity:.3; pointer-events:none; }
+    .loan-count-display{
+      font-size:.9rem; font-weight:800;
+      min-width:70px; text-align:center;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:10px; padding:6px 10px;
+    }
+    .loan-pay-next-btn{
+      padding:9px 18px;
+      border-radius:14px;
+      border:none; cursor:pointer;
+      font-size:.85rem; font-weight:700;
+      color:#fff;
+      transition:.18s ease;
+      white-space:nowrap;
+    }
+    .loan-pay-next-btn:hover{ transform:translateY(-1px); box-shadow:0 8px 20px rgba(106,92,255,.3); }
+    .loan-pay-next-btn:disabled{ opacity:.35; pointer-events:none; }
+
+    .loan-card.loan-done .loan-progress-head .paid-pct{ color:var(--good); }
+
+    /* loan form */
+    .loan-form-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+      margin-bottom:10px;
+    }
     .goal-card-complete .goal-actions{
       display:none !important;
     }
@@ -3545,6 +3711,26 @@
           </div>
           <div class="goals-grid" id="goalsContainer" style="margin-top:14px"></div>
         </section>
+
+        <!-- ══ LOANS ══ -->
+        <section class="glass management-card" id="loansSection">
+          <div class="section-head">
+            <h3>وام‌ها و اقساط</h3>
+            <span>پیگیری بازپرداخت وام‌ها</span>
+          </div>
+
+          <div class="loan-form-grid">
+            <input class="input" type="text"   id="newLoanTitle"       placeholder="نام وام (مثلاً بانک ملت)">
+            <input class="input" type="number" id="newLoanInstallment" placeholder="مبلغ هر قسط (تومان)">
+            <input class="input" type="number" id="newLoanTotal"       placeholder="تعداد اقساط کل">
+            <input class="input" type="number" id="newLoanPaid"        placeholder="قسط‌های پرداخت‌شده (اختیاری)" min="0">
+          </div>
+          <button class="save-goal-btn secondary full-width-action" type="button" id="addLoanBtn">
+            <i class="fa-solid fa-plus" style="margin-left:6px"></i>افزودن وام
+          </button>
+
+          <div class="loans-grid" id="loansContainer"></div>
+        </section>
       </div>
     </section>
 
@@ -3738,6 +3924,7 @@
         transactions: 'finora_transactions',
         categories: 'finora_categories',
         goals: 'finora_goals',
+        loans: 'finora_loans',
         initialBalance: 'finora_initial_balance',
         theme: 'finora_theme',
         profile: 'finora_profile',
@@ -3898,6 +4085,7 @@ const presetAvatars = [
         transactions: [],
         categories: [],
         goals: [],
+        loans: [],
         profile: {
           name: 'کاربر',
           avatar: defaultProfileAvatar,
@@ -4404,6 +4592,8 @@ function parseMoneyInput(value) {
         state.transactions = migrateTransactions(transactions);
         let goals = safeJSON(localStorage.getItem(STORAGE_KEYS.goals));
         state.goals = migrateGoals(goals);
+        const savedLoans = safeJSON(localStorage.getItem(STORAGE_KEYS.loans));
+        if (Array.isArray(savedLoans)) state.loans = savedLoans;
         let profile = safeJSON(localStorage.getItem(STORAGE_KEYS.profile));
         state.profile = normalizeProfile(profile);
 
@@ -4456,6 +4646,10 @@ function parseMoneyInput(value) {
 
       function persistGoals() {
         safeStorageSet(STORAGE_KEYS.goals, JSON.stringify(state.goals));
+      }
+
+      function persistLoans() {
+        safeStorageSet(STORAGE_KEYS.loans, JSON.stringify(state.loans));
       }
 
       function persistInitialBalance() {
@@ -6620,6 +6814,261 @@ function renderCalendarView() {
         renderSmartInsights();
       }
 
+      // ══════════════════════════════════════════════════════════
+      // LOANS
+      // ══════════════════════════════════════════════════════════
+      const LOAN_ACCENTS = [
+        { fill:'linear-gradient(90deg,#6a5cff,#a78bfa)', glow:'rgba(106,92,255,.35)' },
+        { fill:'linear-gradient(90deg,#00d2ff,#38bdf8)', glow:'rgba(0,210,255,.32)' },
+        { fill:'linear-gradient(90deg,#ff3cac,#fb7185)', glow:'rgba(255,60,172,.30)' },
+        { fill:'linear-gradient(90deg,#18e6a6,#34d399)', glow:'rgba(24,230,166,.30)' },
+        { fill:'linear-gradient(90deg,#f59e0b,#fbbf24)', glow:'rgba(245,158,11,.28)' },
+      ];
+
+      function renderLoans() {
+        const container = document.getElementById('loansContainer');
+        if (!container) return;
+        if (!state.loans.length) {
+          container.innerHTML = `
+            <div class="empty-state" style="padding:24px 16px">
+              <i class="fa-solid fa-hand-holding-dollar"></i>
+              <h4>وامی ثبت نشده</h4>
+              <p>وام‌های بانکی، اقساط یا هر بدهی منظمت رو اینجا اضافه کن.</p>
+            </div>`;
+          return;
+        }
+
+        container.innerHTML = '';
+        state.loans.forEach((loan, idx) => {
+          const accent = LOAN_ACCENTS[idx % LOAN_ACCENTS.length];
+          const total      = loan.installmentAmount * loan.totalInstallments;
+          const paid       = loan.installmentAmount * loan.paidInstallments;
+          const remaining  = total - paid;
+          const pct        = loan.totalInstallments > 0
+            ? Math.min(100, Math.round((loan.paidInstallments / loan.totalInstallments) * 100))
+            : 0;
+          const isDone     = pct >= 100;
+
+          const card = document.createElement('article');
+          card.className = `loan-card ${isDone ? 'loan-done' : ''}`;
+          card.dataset.loanId = loan.id;
+
+          card.innerHTML = `
+            <div class="loan-glow" style="background:${accent.glow}"></div>
+
+            <div class="loan-header">
+              <div class="loan-title-row">
+                <span class="loan-title">${escapeHtml(loan.title)}</span>
+                <span class="loan-status-badge ${isDone ? 'done' : 'active'}">
+                  <i class="fa-solid ${isDone ? 'fa-circle-check' : 'fa-circle-half-stroke'}"></i>
+                  ${isDone ? 'تسویه شد' : `قسط ${toPersianNumber(loan.paidInstallments)} از ${toPersianNumber(loan.totalInstallments)}`}
+                </span>
+              </div>
+              <div style="display:flex;gap:6px;flex:0 0 auto">
+                ${!isDone ? `
+                <button class="edit-btn" type="button" data-edit-loan="${loan.id}" aria-label="ویرایش وام">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>` : ''}
+                <button class="delete-btn" type="button" data-delete-loan="${loan.id}" aria-label="حذف وام">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="loan-stats">
+              <div class="loan-stat">
+                <span class="loan-stat-label">هر قسط</span>
+                <span class="loan-stat-value">${formatMoneyCompact(loan.installmentAmount)}</span>
+              </div>
+              <div class="loan-stat">
+                <span class="loan-stat-label">تعداد کل</span>
+                <span class="loan-stat-value">${toPersianNumber(loan.totalInstallments)} قسط</span>
+              </div>
+              <div class="loan-stat">
+                <span class="loan-stat-label">مبلغ کل</span>
+                <span class="loan-stat-value">${formatMoneyCompact(total)}</span>
+              </div>
+            </div>
+
+            <div class="loan-progress-head">
+              <span class="paid-label" style="color:var(--muted);font-size:.82rem">پیشرفت بازپرداخت</span>
+              <span class="paid-pct" style="color:${isDone ? 'var(--good)' : 'var(--accent2)'}">
+                ${toPersianNumber(pct)}٪
+              </span>
+            </div>
+            <div class="loan-progress-track">
+              <div class="loan-progress-fill ${isDone ? 'done-fill' : ''}"
+                   style="width:0%;background:${accent.fill}"
+                   data-target-width="${pct}%"></div>
+            </div>
+            <div class="loan-amounts-row">
+              <span>پرداخت شده: <strong>${formatMoney(paid)}</strong></span>
+              <span>باقی‌مانده: <strong style="color:${isDone ? 'var(--good)' : 'var(--bad)'}">${isDone ? 'تسویه' : formatMoney(remaining)}</strong></span>
+            </div>
+
+            ${isDone ? `
+              <div style="text-align:center;padding:8px 0;color:var(--good);font-weight:800;font-size:.95rem">
+                <i class="fa-solid fa-party-horn"></i> این وام کاملاً پرداخت شده!
+              </div>
+            ` : `
+              <div class="loan-action-row">
+                <div class="loan-installment-counter">
+                  <button class="loan-count-btn" type="button"
+                    data-loan-dec="${loan.id}" ${loan.paidInstallments <= 0 ? 'disabled' : ''}>−</button>
+                  <span class="loan-count-display">
+                    ${toPersianNumber(loan.paidInstallments)} / ${toPersianNumber(loan.totalInstallments)}
+                  </span>
+                  <button class="loan-count-btn" type="button"
+                    data-loan-inc="${loan.id}" ${loan.paidInstallments >= loan.totalInstallments ? 'disabled' : ''}>+</button>
+                </div>
+                <div></div>
+                <button class="loan-pay-next-btn" type="button"
+                  data-loan-pay="${loan.id}"
+                  style="background:${accent.fill}">
+                  <i class="fa-solid fa-check" style="margin-left:5px"></i>ثبت پرداخت بعدی
+                </button>
+              </div>
+            `}
+          `;
+          container.appendChild(card);
+        });
+
+        // Animate progress bars
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          container.querySelectorAll('.loan-progress-fill[data-target-width]').forEach(el => {
+            el.style.width = el.dataset.targetWidth;
+          });
+        }));
+      }
+
+      function addLoan() {
+        const title       = String(document.getElementById('newLoanTitle')?.value || '').trim();
+        const installAmt  = parseMoneyInput(document.getElementById('newLoanInstallment')?.value);
+        const totalInst   = parseInt(document.getElementById('newLoanTotal')?.value || '0', 10);
+        const paidInst    = Math.max(0, parseInt(document.getElementById('newLoanPaid')?.value || '0', 10));
+
+        if (!title)        { alert('لطفاً نام وام را وارد کن.'); return; }
+        if (!installAmt)   { alert('مبلغ هر قسط را وارد کن.'); return; }
+        if (!totalInst || totalInst < 1) { alert('تعداد اقساط را وارد کن.'); return; }
+        if (paidInst > totalInst) { alert('تعداد پرداخت‌شده نمی‌تواند از کل بیشتر باشد.'); return; }
+
+        state.loans.unshift({
+          id: uid(),
+          title,
+          installmentAmount: installAmt,
+          totalInstallments: totalInst,
+          paidInstallments: paidInst,
+          createdAt: Date.now()
+        });
+        persistLoans();
+        renderLoans();
+
+        document.getElementById('newLoanTitle').value = '';
+        document.getElementById('newLoanInstallment').value = '';
+        document.getElementById('newLoanTotal').value = '';
+        document.getElementById('newLoanPaid').value = '';
+      }
+
+      function loanAction(type, loanId) {
+        const loan = state.loans.find(l => l.id === loanId);
+        if (!loan) return;
+        if (type === 'inc') {
+          if (loan.paidInstallments < loan.totalInstallments) loan.paidInstallments++;
+        } else if (type === 'dec') {
+          if (loan.paidInstallments > 0) loan.paidInstallments--;
+        } else if (type === 'pay') {
+          if (loan.paidInstallments < loan.totalInstallments) loan.paidInstallments++;
+        } else if (type === 'delete') {
+          if (!confirm(`وام «${loan.title}» حذف شود؟`)) return;
+          state.loans = state.loans.filter(l => l.id !== loanId);
+        }
+        persistLoans();
+        renderLoans();
+      }
+
+      function openLoanEdit(loanId) {
+        const loan = state.loans.find(l => l.id === loanId);
+        if (!loan) return;
+        document.getElementById('editLoanTitle').value       = loan.title;
+        document.getElementById('editLoanInstallment').value = loan.installmentAmount;
+        document.getElementById('editLoanTotal').value       = loan.totalInstallments;
+        document.getElementById('editLoanPaid').value        = loan.paidInstallments;
+        const modal = document.getElementById('loanEditModal');
+        modal.dataset.editingLoanId = loanId;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden','false');
+      }
+
+      function closeLoanEdit() {
+        const modal = document.getElementById('loanEditModal');
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden','true');
+        delete modal.dataset.editingLoanId;
+      }
+
+      function saveLoanEdit() {
+        const modal   = document.getElementById('loanEditModal');
+        const loanId  = modal.dataset.editingLoanId;
+        const loan    = state.loans.find(l => l.id === loanId);
+        if (!loan) return;
+
+        const title      = String(document.getElementById('editLoanTitle').value || '').trim();
+        const installAmt = parseMoneyInput(document.getElementById('editLoanInstallment').value);
+        const totalInst  = parseInt(document.getElementById('editLoanTotal').value || '0', 10);
+        const paidInst   = Math.max(0, parseInt(document.getElementById('editLoanPaid').value || '0', 10));
+
+        if (!title)                       { alert('نام وام را وارد کن.'); return; }
+        if (!installAmt)                  { alert('مبلغ هر قسط را وارد کن.'); return; }
+        if (!totalInst || totalInst < 1)  { alert('تعداد اقساط را وارد کن.'); return; }
+        if (paidInst > totalInst)         { alert('تعداد پرداخت‌شده از کل بیشتر است.'); return; }
+
+        loan.title             = title;
+        loan.installmentAmount = installAmt;
+        loan.totalInstallments = totalInst;
+        loan.paidInstallments  = paidInst;
+
+        persistLoans();
+        renderLoans();
+        closeLoanEdit();
+      }
+
+      function wireLoanEvents() {
+        // Single delegated listener handles ALL loan interactions
+        document.addEventListener('click', e => {
+          // Add loan
+          if (e.target.closest('#addLoanBtn')) { addLoan(); return; }
+
+          // Open edit modal
+          const editBtn = e.target.closest('[data-edit-loan]');
+          if (editBtn) { openLoanEdit(editBtn.dataset.editLoan); return; }
+
+          // Save loan edit
+          if (e.target.closest('#saveLoanEditBtn')) { saveLoanEdit(); return; }
+
+          // Close loan edit modal
+          if (e.target.closest('#closeLoanEditBtn')) { closeLoanEdit(); return; }
+
+          // Backdrop click
+          if (e.target.id === 'loanEditModal') { closeLoanEdit(); return; }
+
+          // Pay next installment
+          const payBtn = e.target.closest('[data-loan-pay]');
+          if (payBtn) { loanAction('pay', payBtn.dataset.loanPay); return; }
+
+          // Increment paid
+          const incBtn = e.target.closest('[data-loan-inc]');
+          if (incBtn) { loanAction('inc', incBtn.dataset.loanInc); return; }
+
+          // Decrement paid
+          const decBtn = e.target.closest('[data-loan-dec]');
+          if (decBtn) { loanAction('dec', decBtn.dataset.loanDec); return; }
+
+          // Delete loan
+          const delBtn = e.target.closest('[data-delete-loan]');
+          if (delBtn) { loanAction('delete', delBtn.dataset.deleteLoan); return; }
+        });
+      }
+
       function renderAll() {
         renderSummary();
         renderProfile();
@@ -6630,6 +7079,7 @@ function renderCalendarView() {
         renderBudgets();
         renderCategoryManager();
         renderGoals();
+        renderLoans();
         renderHomeExpenseBreakdown();
         renderHomeInsights();
         renderAI();
@@ -7482,6 +7932,7 @@ function renderCalendarView() {
         renderAll();
         setupEventHandlers();
         setupArchiveEvents();
+        wireLoanEvents();
         ensurePageConsistency();
         syncProfileToUI();
         renderTransactionCategories();
@@ -7495,8 +7946,39 @@ function renderCalendarView() {
       boot();
     })();
   </script>
+  <!-- Loan Edit Modal -->
+  <div class="modal-overlay" id="loanEditModal" aria-hidden="true">
+    <div class="glass transaction-modal" style="border-radius:32px 32px 0 0;padding:10px 20px 28px;max-width:520px;width:100%">
+      <div class="modal-drag-handle"></div>
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">ویرایش وام</div>
+          <div class="modal-subtitle">اطلاعات وام رو ویرایش کن</div>
+        </div>
+        <button class="close-btn" type="button" id="closeLoanEditBtn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="field">
+        <label>نام وام</label>
+        <input class="input" type="text" id="editLoanTitle" placeholder="مثلاً بانک ملت">
+      </div>
+      <div class="form-grid two" style="margin-top:10px">
+        <div class="field">
+          <label>مبلغ هر قسط (تومان)</label>
+          <input class="input" type="number" id="editLoanInstallment">
+        </div>
+        <div class="field">
+          <label>تعداد اقساط کل</label>
+          <input class="input" type="number" id="editLoanTotal" min="1">
+        </div>
+      </div>
+      <div class="field" style="margin-top:10px">
+        <label>قسط‌های پرداخت‌شده</label>
+        <input class="input" type="number" id="editLoanPaid" min="0">
+      </div>
+      <button class="save-btn" type="button" id="saveLoanEditBtn" style="margin-top:14px">ذخیره تغییرات</button>
+    </div>
+  </div>
+
 </body>
 
 </html>
-
-              
