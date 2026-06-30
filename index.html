@@ -8122,20 +8122,31 @@ function renderCalendarView() {
             .catch(err => console.error('Service Worker registration failed:', err));
         }
 
+      let _listenersWired = false;
+
       function boot() {
         loadState();
         setupTheme();
-        
+
         setActivePage('home');
         state.transactionType = 'expense';
         state.transactionCategory = fallbackCategoryKey('expense');
         syncProfileToUI();
         checkAndAutoArchive();
-        // setupPWA();
         renderAll();
-        setupEventHandlers();
-        setupArchiveEvents();
-        wireLoanEvents();
+
+        // مهم: setupEventHandlers و بقیه‌ی wire-up توابع، listener روی
+        // document/window اضافه می‌کنن. اگه boot() دوباره صدا زده بشه
+        // (مثلاً بعد از یک realtime sync یا re-login)، این کار باعث
+        // می‌شه listener ها تکراری بشن و هر اکشن چندبار اجرا بشه.
+        // پس این بخش فقط یک‌بار در طول عمر صفحه اجرا می‌شه.
+        if (!_listenersWired) {
+          _listenersWired = true;
+          setupEventHandlers();
+          setupArchiveEvents();
+          wireLoanEvents();
+        }
+
         ensurePageConsistency();
         syncProfileToUI();
         renderTransactionCategories();
@@ -8164,9 +8175,15 @@ function renderCalendarView() {
   </script>
   <script>
   /* ══════════════════════════════════════════
-     FINORA × SUPABASE  —  Auth + Sync Layer v4
-     (clean rewrite — verified, no undeclared vars,
-      no infinite loops, realtime works both ways)
+     FINORA × SUPABASE  —  Auth + Sync Layer v5
+     ──────────────────────────────────────────
+     معماری جدید: کل state اپ (همون چیزی که در
+     localStorage هست) به‌صورت یک شیء JSON واحد
+     در ستون user_data.data ذخیره می‌شه.
+     این یعنی هیچ‌وقت دیگه field mismatch
+     (مثل name/label یا emoji/icon) پیش نمیاد،
+     چون هیچ mappingـی در کار نیست — همون مقداری
+     که در localStorage هست، عیناً sync می‌شه.
   ══════════════════════════════════════════ */
   (() => {
     'use strict';
@@ -8174,7 +8191,19 @@ function renderCalendarView() {
     const SUPABASE_URL = 'https://xqibpsageodzkisabzbh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxaWJwc2FnZW9kemtpc2FiemJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NTMzMTQsImV4cCI6MjA5ODEyOTMxNH0.4fyLHKq-Opf_uqTa4_8nHoofHjry0l52752QCsMlxy8';
 
-    // مهم: نسخه اصلی setItem رو قبل از هرگونه override ذخیره می‌کنیم
+    // کلیدهایی از localStorage که باید sync بشن (همون STORAGE_KEYS اپ)
+    const SYNCED_KEYS = [
+      'finora_transactions',
+      'finora_categories',
+      'finora_goals',
+      'finora_loans',
+      'finora_initial_balance',
+      'finora_theme',
+      'finora_profile',
+      'finora_monthly_archive'
+    ];
+
+    // نسخه اصلی setItem — قبل از هرگونه override ذخیره می‌شه
     const _origSetItem = localStorage.setItem.bind(localStorage);
 
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
@@ -8185,16 +8214,16 @@ function renderCalendarView() {
       }
     });
 
-    // ── همه متغیرهای state این لایه، همگی declare شده ──
-    let currentUser      = null;
-    let bootCalled        = false;
-    let isLoading          = false;   // در حال pull از سوپربیس
-    let isSaving            = false;   // در حال push به سوپربیس
-    let saveQueued            = false;   // یه save دیگه بعد از این یکی لازمه؟
-    let saveDebounce            = null;
-    let pullDebounce              = null;
-    let realtimeChannel            = null;
+    let currentUser        = null;
+    let bootCalled          = false;
+    let isLoading            = false;  // در حال pull
+    let isSaving              = false;  // در حال push
+    let saveQueued              = false;
+    let saveDebounce              = null;
+    let pullDebounce                = null;
+    let realtimeChannel              = null;
     let loadingSafetyTimer            = null;
+    let lastSavedSnapshot              = null; // آخرین چیزی که خودمون save کردیم
 
     /* ── DOM refs ── */
     const authOverlay      = document.getElementById('authOverlay');
@@ -8211,9 +8240,7 @@ function renderCalendarView() {
     const registerSuccess  = document.getElementById('registerSuccess');
     const profileUserEmail = document.getElementById('profileUserEmail');
 
-    /* ══════════════════════════
-       TAB SWITCH
-    ══════════════════════════ */
+    /* ══════════════════════════ TAB SWITCH ══════════════════════════ */
     tabLogin.addEventListener('click', () => {
       tabLogin.classList.add('active');
       tabRegister.classList.remove('active');
@@ -8235,9 +8262,7 @@ function renderCalendarView() {
     function showFieldError(el, msg) { el.textContent = msg; el.classList.add('show'); }
     function showFieldSuccess(el, msg) { el.textContent = msg; el.classList.add('show'); }
 
-    /* ══════════════════════════
-       LOGIN
-    ══════════════════════════ */
+    /* ══════════════════════════ LOGIN ══════════════════════════ */
     loginBtn.addEventListener('click', async () => {
       const email    = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
@@ -8251,12 +8276,10 @@ function renderCalendarView() {
       if (error) showFieldError(loginError, translateAuthError(error.message));
     });
 
-    /* ══════════════════════════
-       REGISTER
-    ══════════════════════════ */
+    /* ══════════════════════════ REGISTER ══════════════════════════ */
     registerBtn.addEventListener('click', async () => {
-      const email    = document.getElementById('regEmail').value.trim();
-      const password = document.getElementById('regPassword').value;
+      const email     = document.getElementById('regEmail').value.trim();
+      const password  = document.getElementById('regPassword').value;
       const confirmPw = document.getElementById('regPasswordConfirm').value;
       if (!email || !password) return showFieldError(registerError, 'ایمیل و رمز عبور را وارد کنید.');
       if (password.length < 6) return showFieldError(registerError, 'رمز عبور باید حداقل ۶ کاراکتر باشد.');
@@ -8275,22 +8298,23 @@ function renderCalendarView() {
       }
     });
 
-    /* ══════════════════════════
-       LOGOUT
-    ══════════════════════════ */
+    /* ══════════════════════════ LOGOUT ══════════════════════════ */
     if (logoutBtn) {
       logoutBtn.addEventListener('click', async () => {
         if (!confirm('از حساب کاربری خارج می‌شوید؟')) return;
         stopRealtime();
         bootCalled = false;
+        lastSavedSnapshot = null;
+        // مهم: قبل از خروج، داده‌های لوکال این کاربر رو پاک می‌کنیم
+        // تا کاربر بعدی روی همین دستگاه با داده‌های قبلی شروع نکنه
+        SYNCED_KEYS.forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
         await sb.auth.signOut();
+        location.reload(); // ریست کامل state اپ برای جلوگیری از باقی‌موندن داده قبلی در حافظه
       });
     }
 
     /* ══════════════════════════════════════════════
        AUTH STATE
-       - getSession() در لحظه لود صفحه چک می‌کنه
-       - onAuthStateChange فقط برای تغییرات بعدی
     ══════════════════════════════════════════════ */
     async function handleSession(session) {
       if (session && session.user) {
@@ -8303,8 +8327,8 @@ function renderCalendarView() {
         if (!bootCalled) {
           bootCalled = true;
           if (typeof window.boot === 'function') window.boot();
-        } else {
-          if (typeof window.reloadStateAndRender === 'function') window.reloadStateAndRender();
+        } else if (typeof window.reloadStateAndRender === 'function') {
+          window.reloadStateAndRender();
         }
 
         startRealtime();
@@ -8328,9 +8352,7 @@ function renderCalendarView() {
       handleSession(session);
     });
 
-    /* ══════════════════════════
-       SYNC STATUS BAR
-    ══════════════════════════ */
+    /* ══════════════════════════ SYNC STATUS BAR ══════════════════════════ */
     function showSync(type, msg) {
       syncBar.textContent = msg;
       syncBar.className = 'show ' + type;
@@ -8340,14 +8362,39 @@ function renderCalendarView() {
       }
     }
 
+    function safeJSONParse(raw) { try { return JSON.parse(raw); } catch { return null; } }
+
+    /* ══════════════════════════════════════════════
+       جمع‌آوری کل state از localStorage به یک شیء
+    ══════════════════════════════════════════════ */
+    function collectLocalState() {
+      const out = {};
+      SYNCED_KEYS.forEach(key => {
+        const raw = localStorage.getItem(key);
+        out[key] = raw === null ? null : raw;
+      });
+      return out;
+    }
+
+    /* ══════════════════════════════════════════════
+       نوشتن یک شیء state به localStorage
+       (با _origSetItem تا حلقه ایجاد نشه)
+    ══════════════════════════════════════════════ */
+    function applyRemoteState(obj) {
+      if (!obj || typeof obj !== 'object') return;
+      SYNCED_KEYS.forEach(key => {
+        if (Object.prototype.hasOwnProperty.call(obj, key) && obj[key] !== null && obj[key] !== undefined) {
+          _origSetItem(key, obj[key]);
+        }
+      });
+    }
+
     /* ══════════════════════════════════════════════
        LOAD FROM SUPABASE  (pull)
-       از _origSetItem استفاده می‌کنه تا save مجدد
-       trigger نشه و isLoading از stuck شدن جلوگیری می‌کنه
     ══════════════════════════════════════════════ */
     async function loadFromSupabase() {
       if (!currentUser) return;
-      if (isLoading) return; // از فراخوانی همزمان جلوگیری می‌کنه
+      if (isLoading) return;
 
       isLoading = true;
       clearTimeout(loadingSafetyTimer);
@@ -8356,52 +8403,21 @@ function renderCalendarView() {
       showSync('syncing', '⏳ در حال بارگذاری اطلاعات...');
       try {
         const uid = currentUser.id;
+        const { data, error } = await sb
+          .from('user_data')
+          .select('data')
+          .eq('user_id', uid)
+          .maybeSingle();
 
-        const { data: prof } = await sb.from('profiles').select('*').eq('id', uid).single();
-        if (prof) {
-          _origSetItem('finora_initial_balance', String(prof.initial_balance || 0));
-          _origSetItem('finora_theme', prof.theme || 'dark');
-          _origSetItem('finora_profile', JSON.stringify({
-            name: prof.name || 'کاربر',
-            avatarMode: prof.avatar_mode || 'upload',
-            avatarIndex: prof.avatar_index === undefined || prof.avatar_index === null ? -1 : prof.avatar_index,
-            avatar: prof.avatar_data || ''
-          }));
-        }
+        if (error) throw error;
 
-        const { data: txs } = await sb.from('transactions').select('*').eq('user_id', uid);
-        if (Array.isArray(txs)) {
-          _origSetItem('finora_transactions', JSON.stringify(
-            txs.map(t => ({ id: t.id, type: t.type, amount: t.amount, category: t.category, note: t.note, createdAt: t.created_at }))
-          ));
-        }
-
-        const { data: cats } = await sb.from('categories').select('*').eq('user_id', uid);
-        if (Array.isArray(cats) && cats.length) {
-          _origSetItem('finora_categories', JSON.stringify(
-            cats.map(c => ({ id: c.id, key: c.key, label: c.label, icon: c.icon, color: c.color, type: c.type, builtin: c.builtin }))
-          ));
-        }
-
-        const { data: goals } = await sb.from('goals').select('*').eq('user_id', uid);
-        if (Array.isArray(goals)) {
-          _origSetItem('finora_goals', JSON.stringify(
-            goals.map(g => ({ id: g.id, name: g.name, target: g.target, saved: g.saved, icon: g.icon, color: g.color, createdAt: g.created_at }))
-          ));
-        }
-
-        const { data: loans } = await sb.from('loans').select('*').eq('user_id', uid);
-        if (Array.isArray(loans)) {
-          _origSetItem('finora_loans', JSON.stringify(
-            loans.map(l => ({ id: l.id, person: l.person, amount: l.amount, type: l.type, note: l.note, date: l.date, paid: l.paid, createdAt: l.created_at }))
-          ));
-        }
-
-        const { data: archive } = await sb.from('monthly_archive').select('*').eq('user_id', uid);
-        if (Array.isArray(archive) && archive.length) {
-          const obj = {};
-          archive.forEach(a => { obj[a.month_key] = a.data; });
-          _origSetItem('finora_monthly_archive', JSON.stringify(obj));
+        if (data && data.data && Object.keys(data.data).length) {
+          applyRemoteState(data.data);
+          lastSavedSnapshot = JSON.stringify(data.data);
+        } else {
+          // کاربر تازه‌ست یا هنوز چیزی روی سرور نداره —
+          // هرچی الان لوکال هست رو به‌عنوان baseline push می‌کنیم
+          lastSavedSnapshot = null;
         }
 
         showSync('saved', '✅ اطلاعات بارگذاری شد');
@@ -8416,119 +8432,38 @@ function renderCalendarView() {
 
     /* ══════════════════════════════════════════════
        SAVE TO SUPABASE  (push)
-       اگه save در حال اجراست، یه پرچم می‌ذاره که
-       بعد از اتمام، دوباره save بشه (queued)
     ══════════════════════════════════════════════ */
-    function safeJSON(raw) { try { return JSON.parse(raw); } catch { return null; } }
-
     async function saveToSupabase() {
       if (!currentUser || isLoading) return;
       if (isSaving) { saveQueued = true; return; }
 
       isSaving = true;
       const uid = currentUser.id;
-      showSync('syncing', '☁️ در حال ذخیره...');
+
       try {
-        const txs      = safeJSON(localStorage.getItem('finora_transactions')) || [];
-        const cats     = safeJSON(localStorage.getItem('finora_categories')) || [];
-        const goals    = safeJSON(localStorage.getItem('finora_goals')) || [];
-        const loans    = safeJSON(localStorage.getItem('finora_loans')) || [];
-        const profile  = safeJSON(localStorage.getItem('finora_profile')) || {};
-        const initBal  = parseFloat(localStorage.getItem('finora_initial_balance') || '0');
-        const theme    = localStorage.getItem('finora_theme') || 'dark';
-        const archRaw  = safeJSON(localStorage.getItem('finora_monthly_archive')) || {};
+        const snapshot = collectLocalState();
+        const snapshotStr = JSON.stringify(snapshot);
 
-        await sb.from('profiles').upsert({
-          id: uid,
-          name: profile.name || 'کاربر',
-          avatar_mode: profile.avatarMode || 'upload',
-          avatar_index: profile.avatarIndex === undefined || profile.avatarIndex === null ? -1 : profile.avatarIndex,
-          avatar_data: profile.avatar || '',
-          initial_balance: initBal,
-          theme,
-          updated_at: new Date().toISOString()
-        });
-
-        if (txs.length) {
-          await sb.from('transactions').upsert(
-            txs.map(t => ({
-              id: t.id, user_id: uid, type: t.type, amount: t.amount,
-              category: t.category || null, note: t.note || null,
-              created_at: t.createdAt || Date.now(), updated_at: new Date().toISOString()
-            })),
-            { onConflict: 'id' }
-          );
-        }
-        {
-          const { data: remoteTxs } = await sb.from('transactions').select('id').eq('user_id', uid);
-          if (remoteTxs) {
-            const localIds = new Set(txs.map(t => t.id));
-            const toDelete = remoteTxs.filter(r => !localIds.has(r.id)).map(r => r.id);
-            if (toDelete.length) await sb.from('transactions').delete().in('id', toDelete).eq('user_id', uid);
-          }
+        // اگه هیچی تغییر نکرده، نیازی به save نیست
+        if (snapshotStr === lastSavedSnapshot) {
+          isSaving = false;
+          if (saveQueued) { saveQueued = false; saveToSupabase(); }
+          return;
         }
 
-        const custom = cats.filter(c => !c.builtin);
-        if (custom.length) {
-          await sb.from('categories').upsert(
-            custom.map(c => ({
-              id: c.id || (c.key + '_' + uid), user_id: uid, key: c.key, label: c.label,
-              icon: c.icon, color: c.color, type: c.type, builtin: false,
-              updated_at: new Date().toISOString()
-            })),
-            { onConflict: 'id' }
-          );
-        }
+        showSync('syncing', '☁️ در حال ذخیره...');
 
-        if (goals.length) {
-          await sb.from('goals').upsert(
-            goals.map(g => ({
-              id: g.id, user_id: uid, name: g.name, target: g.target,
-              saved: g.saved || 0, icon: g.icon, color: g.color,
-              created_at: g.createdAt || Date.now(), updated_at: new Date().toISOString()
-            })),
-            { onConflict: 'id' }
-          );
-        }
-        {
-          const { data: remoteGoals } = await sb.from('goals').select('id').eq('user_id', uid);
-          if (remoteGoals) {
-            const localIds = new Set(goals.map(g => g.id));
-            const toDelete = remoteGoals.filter(r => !localIds.has(r.id)).map(r => r.id);
-            if (toDelete.length) await sb.from('goals').delete().in('id', toDelete).eq('user_id', uid);
-          }
-        }
+        const { error } = await sb
+          .from('user_data')
+          .upsert({
+            user_id: uid,
+            data: snapshot,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' });
 
-        if (loans.length) {
-          await sb.from('loans').upsert(
-            loans.map(l => ({
-              id: l.id, user_id: uid, person: l.person, amount: l.amount,
-              type: l.type, note: l.note || null, date: l.date || null, paid: l.paid || false,
-              created_at: l.createdAt || Date.now(), updated_at: new Date().toISOString()
-            })),
-            { onConflict: 'id' }
-          );
-        }
-        {
-          const { data: remoteLoans } = await sb.from('loans').select('id').eq('user_id', uid);
-          if (remoteLoans) {
-            const localIds = new Set(loans.map(l => l.id));
-            const toDelete = remoteLoans.filter(r => !localIds.has(r.id)).map(r => r.id);
-            if (toDelete.length) await sb.from('loans').delete().in('id', toDelete).eq('user_id', uid);
-          }
-        }
+        if (error) throw error;
 
-        const archEntries = Object.entries(archRaw);
-        if (archEntries.length) {
-          await sb.from('monthly_archive').upsert(
-            archEntries.map(([key, data]) => ({
-              id: uid + '_' + key, user_id: uid, month_key: key,
-              data, updated_at: new Date().toISOString()
-            })),
-            { onConflict: 'id' }
-          );
-        }
-
+        lastSavedSnapshot = snapshotStr;
         showSync('saved', '✅ ذخیره شد');
       } catch (err) {
         console.error('Save error:', err);
@@ -8537,15 +8472,13 @@ function renderCalendarView() {
         isSaving = false;
         if (saveQueued) {
           saveQueued = false;
-          saveToSupabase(); // یه دور دیگه چون موقع save چیز جدیدی تغییر کرد
+          saveToSupabase();
         }
       }
     }
 
     /* ══════════════════════════════════════════════
        REALTIME
-       وقتی دستگاه دیگه‌ای چیزی تغییر بده، اینجا متوجه
-       می‌شیم و دوباره از سوپربیس pull می‌کنیم
     ══════════════════════════════════════════════ */
     function startRealtime() {
       if (realtimeChannel) return;
@@ -8554,11 +8487,9 @@ function renderCalendarView() {
 
       realtimeChannel = sb
         .channel('finora_sync_' + uid)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'transactions', filter: 'user_id=eq.' + uid }, pullAndRefresh)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'goals',        filter: 'user_id=eq.' + uid }, pullAndRefresh)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'loans',        filter: 'user_id=eq.' + uid }, pullAndRefresh)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'categories',   filter: 'user_id=eq.' + uid }, pullAndRefresh)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles',     filter: 'id=eq.' + uid },      pullAndRefresh)
+        .on('postgres_changes',
+          { event: '*', schema: 'public', table: 'user_data', filter: 'user_id=eq.' + uid },
+          (payload) => pullAndRefresh(payload))
         .subscribe();
     }
 
@@ -8569,9 +8500,14 @@ function renderCalendarView() {
       }
     }
 
-    function pullAndRefresh() {
-      // اگه همین الان داریم save می‌کنیم، این تغییر رو خودمون ایجاد کردیم — نادیده بگیر
+    function pullAndRefresh(payload) {
+      // اگه payload جدید رو از همون چیزی که خودمون الان save کردیم گرفتیم، نادیده بگیر
+      if (payload && payload.new && payload.new.data) {
+        const incoming = JSON.stringify(payload.new.data);
+        if (incoming === lastSavedSnapshot) return; // این تغییر خودمونه
+      }
       if (isSaving) return;
+
       clearTimeout(pullDebounce);
       pullDebounce = setTimeout(async () => {
         showSync('syncing', '🔄 دستگاه دیگری داده را تغییر داد...');
@@ -8582,19 +8518,18 @@ function renderCalendarView() {
           window.renderAll();
         }
         showSync('saved', '✅ همگام‌سازی شد');
-      }, 600);
+      }, 500);
     }
 
     /* ══════════════════════════════════════════════
-       HOOK localStorage.setItem
-       isLoading=true → skip (جلوگیری از حلقه)
+       HOOK localStorage.setItem — برای auto-save
     ══════════════════════════════════════════════ */
     localStorage.setItem = function (key, value) {
       _origSetItem(key, value);
       if (isLoading) return;
-      if (typeof key === 'string' && key.indexOf('finora_') === 0 && key !== 'finora_last_seen_month' && currentUser) {
+      if (typeof key === 'string' && SYNCED_KEYS.indexOf(key) !== -1 && currentUser) {
         clearTimeout(saveDebounce);
-        saveDebounce = setTimeout(saveToSupabase, 1200);
+        saveDebounce = setTimeout(saveToSupabase, 1000);
       }
     };
 
@@ -8603,17 +8538,12 @@ function renderCalendarView() {
       if (e.target && e.target.id === 'resetConfirmBtn' && currentUser) {
         const uid = currentUser.id;
         try {
-          await Promise.all([
-            sb.from('transactions').delete().eq('user_id', uid),
-            sb.from('categories').delete().eq('user_id', uid),
-            sb.from('goals').delete().eq('user_id', uid),
-            sb.from('loans').delete().eq('user_id', uid),
-            sb.from('monthly_archive').delete().eq('user_id', uid),
-            sb.from('profiles').update({
-              initial_balance: 0, name: 'کاربر',
-              avatar_data: '', avatar_mode: 'upload', avatar_index: -1
-            }).eq('id', uid)
-          ]);
+          await sb.from('user_data').upsert({
+            user_id: uid,
+            data: {},
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+          lastSavedSnapshot = JSON.stringify({});
         } catch (err) {
           console.error('Remote reset error:', err);
         }
