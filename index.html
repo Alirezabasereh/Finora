@@ -8175,15 +8175,16 @@ function renderCalendarView() {
   </script>
   <script>
   /* ══════════════════════════════════════════
-     FINORA × SUPABASE  —  Auth + Sync Layer v5
+     FINORA × SUPABASE  —  Auth + Sync Layer v6
      ──────────────────────────────────────────
-     معماری جدید: کل state اپ (همون چیزی که در
-     localStorage هست) به‌صورت یک شیء JSON واحد
-     در ستون user_data.data ذخیره می‌شه.
-     این یعنی هیچ‌وقت دیگه field mismatch
-     (مثل name/label یا emoji/icon) پیش نمیاد،
-     چون هیچ mappingـی در کار نیست — همون مقداری
-     که در localStorage هست، عیناً sync می‌شه.
+     حلقه‌ی save→realtime→load→save کاملاً قطع شد:
+     - پرچم isSelfUpdate: وقتی خودمون save می‌کنیم
+       realtime event بعدیش نادیده گرفته می‌شه
+     - پرچم isLoading: وقتی داریم load می‌کنیم
+       هیچ‌کدوم از setItem ها save trigger نمی‌کنن
+     - loadState() داخل boot/reloadStateAndRender
+       از طریق _origSetItem ها persist نمی‌کنه
+       (ما loadFromSupabase قبلاً این کارو کرده)
   ══════════════════════════════════════════ */
   (() => {
     'use strict';
@@ -8191,7 +8192,6 @@ function renderCalendarView() {
     const SUPABASE_URL = 'https://xqibpsageodzkisabzbh.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxaWJwc2FnZW9kemtpc2FiemJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NTMzMTQsImV4cCI6MjA5ODEyOTMxNH0.4fyLHKq-Opf_uqTa4_8nHoofHjry0l52752QCsMlxy8';
 
-    // کلیدهایی از localStorage که باید sync بشن (همون STORAGE_KEYS اپ)
     const SYNCED_KEYS = [
       'finora_transactions',
       'finora_categories',
@@ -8203,27 +8203,23 @@ function renderCalendarView() {
       'finora_monthly_archive'
     ];
 
-    // نسخه اصلی setItem — قبل از هرگونه override ذخیره می‌شه
+    // نسخه اصلی setItem — قبل از هر override
     const _origSetItem = localStorage.setItem.bind(localStorage);
 
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        storageKey: 'finora_sb_session'
-      }
+      auth: { persistSession: true, autoRefreshToken: true, storageKey: 'finora_sb_session' }
     });
 
-    let currentUser        = null;
-    let bootCalled          = false;
-    let isLoading            = false;  // در حال pull
-    let isSaving              = false;  // در حال push
-    let saveQueued              = false;
-    let saveDebounce              = null;
-    let pullDebounce                = null;
-    let realtimeChannel              = null;
-    let loadingSafetyTimer            = null;
-    let lastSavedSnapshot              = null; // آخرین چیزی که خودمون save کردیم
+    let currentUser       = null;
+    let bootCalled         = false;
+    let isLoading           = false;  // داریم از سرور load می‌کنیم → setItem نباید save کنه
+    let isSaving             = false;
+    let saveQueued             = false;
+    let isSelfUpdate            = false; // ما الان save کردیم → realtime event بعدیش skip بشه
+    let saveDebounce             = null;
+    let pullDebounce              = null;
+    let realtimeChannel            = null;
+    let loadingSafetyTimer          = null;
 
     /* ── DOM refs ── */
     const authOverlay      = document.getElementById('authOverlay');
@@ -8255,7 +8251,6 @@ function renderCalendarView() {
       formLogin.style.display = 'none';
       clearMessages();
     });
-
     function clearMessages() {
       [loginError, registerError, registerSuccess].forEach(el => el.classList.remove('show'));
     }
@@ -8304,12 +8299,9 @@ function renderCalendarView() {
         if (!confirm('از حساب کاربری خارج می‌شوید؟')) return;
         stopRealtime();
         bootCalled = false;
-        lastSavedSnapshot = null;
-        // مهم: قبل از خروج، داده‌های لوکال این کاربر رو پاک می‌کنیم
-        // تا کاربر بعدی روی همین دستگاه با داده‌های قبلی شروع نکنه
         SYNCED_KEYS.forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
         await sb.auth.signOut();
-        location.reload(); // ریست کامل state اپ برای جلوگیری از باقی‌موندن داده قبلی در حافظه
+        location.reload();
       });
     }
 
@@ -8342,17 +8334,16 @@ function renderCalendarView() {
 
     sb.auth.getSession().then((res) => {
       handleSession(res.data.session);
-    }).catch((err) => {
-      console.error('getSession error:', err);
+    }).catch(() => {
       authOverlay.classList.remove('hidden');
     });
 
     sb.auth.onAuthStateChange((event, session) => {
-      if (event === 'INITIAL_SESSION') return; // قبلاً توسط getSession هندل شده
+      if (event === 'INITIAL_SESSION') return;
       handleSession(session);
     });
 
-    /* ══════════════════════════ SYNC STATUS BAR ══════════════════════════ */
+    /* ══════════════════════════ SYNC BAR ══════════════════════════ */
     function showSync(type, msg) {
       syncBar.textContent = msg;
       syncBar.className = 'show ' + type;
@@ -8362,64 +8353,56 @@ function renderCalendarView() {
       }
     }
 
-    function safeJSONParse(raw) { try { return JSON.parse(raw); } catch { return null; } }
+    function safeJSONStr(val) {
+      try { return typeof val === 'string' ? val : JSON.stringify(val); } catch { return null; }
+    }
 
     /* ══════════════════════════════════════════════
-       جمع‌آوری کل state از localStorage به یک شیء
+       جمع‌آوری state از localStorage
     ══════════════════════════════════════════════ */
     function collectLocalState() {
       const out = {};
       SYNCED_KEYS.forEach(key => {
         const raw = localStorage.getItem(key);
-        out[key] = raw === null ? null : raw;
+        if (raw !== null) out[key] = raw;
       });
       return out;
     }
 
     /* ══════════════════════════════════════════════
-       نوشتن یک شیء state به localStorage
-       (با _origSetItem تا حلقه ایجاد نشه)
+       نوشتن state روی localStorage
+       حتماً از _origSetItem استفاده می‌کنه
+       تا setItem hook فعال نشه
     ══════════════════════════════════════════════ */
     function applyRemoteState(obj) {
       if (!obj || typeof obj !== 'object') return;
       SYNCED_KEYS.forEach(key => {
-        if (Object.prototype.hasOwnProperty.call(obj, key) && obj[key] !== null && obj[key] !== undefined) {
-          _origSetItem(key, obj[key]);
+        if (key in obj && obj[key] !== null && obj[key] !== undefined) {
+          _origSetItem(key, safeJSONStr(obj[key]));
         }
       });
     }
 
     /* ══════════════════════════════════════════════
-       LOAD FROM SUPABASE  (pull)
+       LOAD FROM SUPABASE
     ══════════════════════════════════════════════ */
     async function loadFromSupabase() {
-      if (!currentUser) return;
-      if (isLoading) return;
-
+      if (!currentUser || isLoading) return;
       isLoading = true;
       clearTimeout(loadingSafetyTimer);
+      // safety: بعد از ۱۵ ثانیه به هر حال isLoading رو آزاد کن
       loadingSafetyTimer = setTimeout(() => { isLoading = false; }, 15000);
-
       showSync('syncing', '⏳ در حال بارگذاری اطلاعات...');
       try {
-        const uid = currentUser.id;
         const { data, error } = await sb
           .from('user_data')
           .select('data')
-          .eq('user_id', uid)
+          .eq('user_id', currentUser.id)
           .maybeSingle();
-
         if (error) throw error;
-
-        if (data && data.data && Object.keys(data.data).length) {
+        if (data && data.data && Object.keys(data.data).length > 0) {
           applyRemoteState(data.data);
-          lastSavedSnapshot = JSON.stringify(data.data);
-        } else {
-          // کاربر تازه‌ست یا هنوز چیزی روی سرور نداره —
-          // هرچی الان لوکال هست رو به‌عنوان baseline push می‌کنیم
-          lastSavedSnapshot = null;
         }
-
         showSync('saved', '✅ اطلاعات بارگذاری شد');
       } catch (err) {
         console.error('Load error:', err);
@@ -8431,49 +8414,32 @@ function renderCalendarView() {
     }
 
     /* ══════════════════════════════════════════════
-       SAVE TO SUPABASE  (push)
+       SAVE TO SUPABASE
     ══════════════════════════════════════════════ */
     async function saveToSupabase() {
       if (!currentUser || isLoading) return;
       if (isSaving) { saveQueued = true; return; }
-
       isSaving = true;
-      const uid = currentUser.id;
-
+      showSync('syncing', '☁️ در حال ذخیره...');
       try {
         const snapshot = collectLocalState();
-        const snapshotStr = JSON.stringify(snapshot);
-
-        // اگه هیچی تغییر نکرده، نیازی به save نیست
-        if (snapshotStr === lastSavedSnapshot) {
-          isSaving = false;
-          if (saveQueued) { saveQueued = false; saveToSupabase(); }
-          return;
-        }
-
-        showSync('syncing', '☁️ در حال ذخیره...');
-
+        // پرچم می‌زنیم که realtime event بعد از این save، حلقه درست نکنه
+        isSelfUpdate = true;
         const { error } = await sb
           .from('user_data')
-          .upsert({
-            user_id: uid,
-            data: snapshot,
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'user_id' });
-
+          .upsert({ user_id: currentUser.id, data: snapshot, updated_at: new Date().toISOString() },
+                  { onConflict: 'user_id' });
         if (error) throw error;
-
-        lastSavedSnapshot = snapshotStr;
         showSync('saved', '✅ ذخیره شد');
+        // پرچم رو بعد از کمی نگه می‌داریم تا realtime event برسه و skip بشه
+        setTimeout(() => { isSelfUpdate = false; }, 3000);
       } catch (err) {
         console.error('Save error:', err);
+        isSelfUpdate = false;
         showSync('error', '❌ خطا در ذخیره‌سازی');
       } finally {
         isSaving = false;
-        if (saveQueued) {
-          saveQueued = false;
-          saveToSupabase();
-        }
+        if (saveQueued) { saveQueued = false; saveToSupabase(); }
       }
     }
 
@@ -8484,12 +8450,11 @@ function renderCalendarView() {
       if (realtimeChannel) return;
       const uid = currentUser ? currentUser.id : null;
       if (!uid) return;
-
       realtimeChannel = sb
         .channel('finora_sync_' + uid)
         .on('postgres_changes',
           { event: '*', schema: 'public', table: 'user_data', filter: 'user_id=eq.' + uid },
-          (payload) => pullAndRefresh(payload))
+          () => { pullAndRefresh(); })
         .subscribe();
     }
 
@@ -8500,14 +8465,9 @@ function renderCalendarView() {
       }
     }
 
-    function pullAndRefresh(payload) {
-      // اگه payload جدید رو از همون چیزی که خودمون الان save کردیم گرفتیم، نادیده بگیر
-      if (payload && payload.new && payload.new.data) {
-        const incoming = JSON.stringify(payload.new.data);
-        if (incoming === lastSavedSnapshot) return; // این تغییر خودمونه
-      }
-      if (isSaving) return;
-
+    function pullAndRefresh() {
+      // اگه خودمون این تغییر رو ایجاد کردیم، نادیده بگیر
+      if (isSelfUpdate || isSaving || isLoading) return;
       clearTimeout(pullDebounce);
       pullDebounce = setTimeout(async () => {
         showSync('syncing', '🔄 دستگاه دیگری داده را تغییر داد...');
@@ -8522,31 +8482,27 @@ function renderCalendarView() {
     }
 
     /* ══════════════════════════════════════════════
-       HOOK localStorage.setItem — برای auto-save
+       HOOK localStorage.setItem
+       مهم‌ترین قانون: isLoading=true → هیچ save نشه
     ══════════════════════════════════════════════ */
     localStorage.setItem = function (key, value) {
-      _origSetItem(key, value);
-      if (isLoading) return;
+      _origSetItem(key, value); // همیشه به localStorage می‌نویسیم
+      if (isLoading) return;   // ← جلوی حلقه رو می‌گیره
       if (typeof key === 'string' && SYNCED_KEYS.indexOf(key) !== -1 && currentUser) {
         clearTimeout(saveDebounce);
         saveDebounce = setTimeout(saveToSupabase, 1000);
       }
     };
 
-    /* ── Reset — پاک کردن remote هم ── */
+    /* ── Reset remote ── */
     document.addEventListener('click', async (e) => {
       if (e.target && e.target.id === 'resetConfirmBtn' && currentUser) {
-        const uid = currentUser.id;
         try {
-          await sb.from('user_data').upsert({
-            user_id: uid,
-            data: {},
-            updated_at: new Date().toISOString()
-          }, { onConflict: 'user_id' });
-          lastSavedSnapshot = JSON.stringify({});
-        } catch (err) {
-          console.error('Remote reset error:', err);
-        }
+          await sb.from('user_data').upsert(
+            { user_id: currentUser.id, data: {}, updated_at: new Date().toISOString() },
+            { onConflict: 'user_id' }
+          );
+        } catch (err) { console.error('Remote reset error:', err); }
       }
     }, true);
 
@@ -8560,7 +8516,7 @@ function renderCalendarView() {
       return msg;
     }
 
-    /* ── Enter key support ── */
+    /* ── Enter key ── */
     document.getElementById('loginPassword').addEventListener('keydown', e => {
       if (e.key === 'Enter') loginBtn.click();
     });
