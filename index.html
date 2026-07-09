@@ -3106,12 +3106,12 @@
       height:100%; border-radius:99px;
       transition:width .7s cubic-bezier(.22,.68,0,1.2);
       position:relative;
+      overflow:hidden;
     }
     .loan-progress-fill::after{
       content:'';
       position:absolute;
       inset:0;
-      overflow:hidden;
       background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);
       animation:shimmer 2.2s ease-in-out infinite;
     }
