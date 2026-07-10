@@ -385,6 +385,30 @@
       gap:10px;
       margin-bottom:14px;
     }
+    .section-add-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      flex:0 0 auto;
+      min-width:118px;
+      padding:9px 14px;
+      border-radius:999px;
+      border:none;
+      background:linear-gradient(135deg,var(--accent1),var(--accent3));
+      color:#fff;
+      font-size:.78rem;
+      font-weight:700;
+      white-space:nowrap;
+      box-shadow:0 8px 18px -8px rgba(106,92,255,.55);
+      transition:transform .15s ease;
+    }
+    .section-add-btn:active{transform:scale(.95)}
+    .section-add-btn i{font-size:.72rem}
+    @media screen and (max-width:380px){
+      .section-add-btn span{display:none}
+      .section-add-btn{padding:10px;border-radius:14px;min-width:auto}
+    }
 
     @media screen and (min-width:360px) and (max-width:404px) {
       .section-head h3,.page-title{font-size:.9rem !important}
@@ -597,6 +621,24 @@
     .chip button{
       border:none;background:transparent;color:inherit;display:grid;place-items:center;padding:0;
     }
+    .category-manage-list{margin-top:0}
+    .category-manage-list .chip{
+      background:color-mix(in srgb, var(--chip-color, var(--accent1)) 12%, rgba(255,255,255,.045));
+      border-color:color-mix(in srgb, var(--chip-color, var(--accent1)) 30%, transparent);
+      padding:9px 8px 9px 12px;
+    }
+    .category-manage-list .chip .dot{width:8px;height:8px}
+    .category-manage-list .chip small{
+      background:rgba(255,255,255,.08);
+      border-radius:999px;
+      padding:2px 8px;
+      font-size:.72rem;
+    }
+    .category-manage-list .chip button{
+      width:22px;height:22px;border-radius:50%;
+      background:rgba(255,255,255,.08);
+      margin-inline-start:2px;
+    }
 
     .budget-list{display:grid;gap:12px}
     .budget-card-item{
@@ -793,15 +835,34 @@
 
     .price-desc-enter{
       display: flex;
-      justify-content: center;
-      align-content: center;
-      gap: 10px;
+      flex-direction: column;
+      gap: 4px;
     }
     .price-enter{
-      width: 50%;
+      width: 100%;
     }
     .desc-enter{
-      width: 50%;
+      width: 100%;
+    }
+    .amount-input-wrap{
+      position:relative;
+      display:flex;
+      align-items:center;
+    }
+    .amount-hero-input{
+      font-size:1.55rem;
+      font-weight:800;
+      text-align:center;
+      padding-inline-end:64px;
+      letter-spacing:.5px;
+    }
+    .amount-input-suffix{
+      position:absolute;
+      inset-inline-end:16px;
+      color:var(--muted);
+      font-size:.85rem;
+      font-weight:600;
+      pointer-events:none;
     }
     @keyframes modalIn{
       from{transform:translateY(18px);opacity:.5}
@@ -830,34 +891,53 @@
     .field{margin-bottom:14px}
     .field label{display:block;margin-bottom:8px;color:var(--muted);font-size:.92rem}
     .category-grid{
-      display:flex;
-      flex-wrap: wrap;
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(84px,1fr));
       gap:10px;
-      justify-content: space-between;
-      align-items: center;
     }
     .category-btn{
-      border:none;
-      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.07);
+      background:rgba(255,255,255,.045);
       color:var(--text);
-      border-radius:18px;
-      padding:14px 12px;
+      border-radius:16px;
+      padding:12px 6px 10px;
       display:flex;
+      flex-direction:column;
       align-items:center;
       justify-content:center;
-      gap:8px;
-      width: 150px;
+      gap:7px;
+      width:auto;
       text-align:center;
       overflow:hidden;
+      transition:transform .15s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
+    }
+    .category-btn:active{transform:scale(.95)}
+    .category-btn .cat-emoji-badge{
+      width:34px;height:34px;border-radius:11px;
+      display:grid;place-items:center;
+      font-size:1.02rem;
+      background:color-mix(in srgb, var(--cat-color, var(--accent1)) 24%, transparent);
+      transition:box-shadow .15s ease, transform .15s ease;
+    }
+    .category-btn .cat-name{
+      font-size:.72rem;
+      font-weight:600;
+      line-height:1.25;
+      max-width:100%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
     }
     .category-btn.active{
-      background:linear-gradient(135deg,var(--accent1),var(--accent2));
-      color:#fff;
+      background:color-mix(in srgb, var(--cat-color, var(--accent1)) 16%, rgba(255,255,255,.045));
+      border-color:color-mix(in srgb, var(--cat-color, var(--accent1)) 55%, transparent);
+      transform:translateY(-1px);
     }
-    .category-btn .dot{
-      width:10px;height:10px;border-radius:50%;
-      display:inline-block;
+    .category-btn.active .cat-emoji-badge{
+      background:var(--cat-color, var(--accent1));
+      box-shadow:0 6px 16px -6px var(--cat-color, var(--accent1));
     }
+    .category-btn.active .cat-name{color:#fff}
     .save-btn{
       width:100%;
       margin-top:10px;
@@ -3853,25 +3933,15 @@
       <div class="budget-page-grid">
         <section class="glass management-card">
           <div class="section-head">
-            <h3>افزودن دسته جدید</h3>
-            <span>برای تراکنش، بودجه و نمودار</span>
+            <div>
+              <h3>افزودن دسته جدید</h3>
+              <span>برای تراکنش، بودجه و نمودار</span>
+            </div>
+            <button class="section-add-btn" type="button" id="openAddCategoryBtn" aria-label="افزودن دسته جدید">
+              <i class="fa-solid fa-plus"></i><span>دسته جدید</span>
+            </button>
           </div>
-          <div class="form-grid two">
-            <input class="input" type="text" id="newCategoryName" placeholder="نام دسته‌بندی">
-            <input class="input" type="text" id="newCategoryEmoji" placeholder="آیکون / ایموجی" maxlength="4">
-          </div>
-          <div class="form-grid three" style="margin-top:10px">
-            <select class="select" id="newCategoryType">
-              <option value="expense">هزینه</option>
-              <option value="income">درآمد</option>
-            </select>
-            <input class="input" type="number" id="newCategoryLimit" placeholder="سقف بودجه">
-            <input class="input" type="color" id="newCategoryColor" value="#6a5cff" style="padding:6px;height:50px">
-          </div>
-          <div style="margin-top:10px">
-            <button class="save-cat-btn full-width-action" type="button" id="addCategoryBtn">افزودن دسته</button>
-          </div>
-          <div class="chips" id="categoryList"></div>
+          <div class="chips category-manage-list" id="categoryList"></div>
         </section>
 
         <section class="glass management-card">
@@ -3884,44 +3954,137 @@
 
         <section class="glass management-card">
           <div class="section-head">
-            <h3>هدف‌های مالی</h3>
-            <span>مثل خرید ماشین، سفر، لپ‌تاپ</span>
+            <div>
+              <h3>هدف‌های مالی</h3>
+              <span>مثل خرید ماشین، سفر، لپ‌تاپ</span>
+            </div>
+            <button class="section-add-btn" type="button" id="openAddGoalBtn" aria-label="افزودن هدف جدید">
+              <i class="fa-solid fa-plus"></i><span>هدف جدید</span>
+            </button>
           </div>
-          <div class="form-grid two">
-            <input class="input" type="text" id="newGoalTitle" placeholder="عنوان هدف">
-            <input class="input" type="number" id="newGoalTarget" placeholder="مبلغ هدف">
-          </div>
-          <div style="margin-top:8px">
-            <label class="field-label" style="display:block;margin-bottom:6px">تاریخ هدف (اختیاری)</label>
-            <input class="input" type="date" id="newGoalDeadline">
-          </div>
-          <div style="margin-top:10px">
-            <button class="save-goal-btn secondary full-width-action" type="button" id="addGoalBtn">افزودن هدف</button>
-          </div>
-          <div class="goals-grid" id="goalsContainer" style="margin-top:14px"></div>
+          <div class="goals-grid" id="goalsContainer"></div>
         </section>
 
         <!-- ══ LOANS ══ -->
         <section class="glass management-card" id="loansSection">
           <div class="section-head">
-            <h3>وام‌ها و اقساط</h3>
-            <span>پیگیری بازپرداخت وام‌ها</span>
+            <div>
+              <h3>وام‌ها و اقساط</h3>
+              <span>پیگیری بازپرداخت وام‌ها</span>
+            </div>
+            <button class="section-add-btn" type="button" id="openAddLoanBtn" aria-label="افزودن وام جدید">
+              <i class="fa-solid fa-plus"></i><span>وام جدید</span>
+            </button>
           </div>
-
-          <div class="loan-form-grid">
-            <input class="input" type="text"   id="newLoanTitle"       placeholder="نام وام (مثلاً بانک ملت)">
-            <input class="input" type="number" id="newLoanInstallment" placeholder="مبلغ هر قسط (تومان)">
-            <input class="input" type="number" id="newLoanTotal"       placeholder="تعداد اقساط کل">
-            <input class="input" type="number" id="newLoanPaid"        placeholder="قسط‌های پرداخت‌شده (اختیاری)" min="0">
-          </div>
-          <button class="save-goal-btn secondary full-width-action" type="button" id="addLoanBtn">
-            <i class="fa-solid fa-plus" style="margin-left:6px"></i>افزودن وام
-          </button>
 
           <div class="loans-grid" id="loansContainer"></div>
         </section>
       </div>
     </section>
+
+    <!-- ══ ADD CATEGORY MODAL ══ -->
+    <div class="modal-overlay" id="addCategoryModal" aria-hidden="true">
+      <div class="glass transaction-modal" style="border-radius:32px 32px 0 0;padding:10px 20px 28px;max-width:520px;width:100%">
+        <div class="modal-drag-handle"></div>
+        <div class="modal-head">
+          <div>
+            <div class="modal-title">دسته‌بندی جدید</div>
+            <div class="modal-subtitle">برای تراکنش، بودجه و نمودار</div>
+          </div>
+          <button class="close-btn" type="button" id="closeAddCategoryBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="field">
+          <label for="newCategoryName">نام دسته‌بندی</label>
+          <input class="input" type="text" id="newCategoryName" placeholder="مثلاً خوراک، حمل‌ونقل...">
+        </div>
+        <div class="form-grid two">
+          <div class="field">
+            <label for="newCategoryEmoji">آیکون / ایموجی</label>
+            <input class="input" type="text" id="newCategoryEmoji" placeholder="🏷️" maxlength="4">
+          </div>
+          <div class="field">
+            <label for="newCategoryType">نوع</label>
+            <select class="select" id="newCategoryType">
+              <option value="expense">هزینه</option>
+              <option value="income">درآمد</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid two">
+          <div class="field">
+            <label for="newCategoryLimit">سقف بودجه (اختیاری)</label>
+            <input class="input" type="number" id="newCategoryLimit" placeholder="۰">
+          </div>
+          <div class="field">
+            <label for="newCategoryColor">رنگ</label>
+            <input class="input" type="color" id="newCategoryColor" value="#6a5cff" style="padding:6px;height:50px">
+          </div>
+        </div>
+        <button class="save-cat-btn full-width-action" type="button" id="addCategoryBtn" style="margin-top:4px">افزودن دسته</button>
+      </div>
+    </div>
+
+    <!-- ══ ADD GOAL MODAL ══ -->
+    <div class="modal-overlay" id="addGoalModal" aria-hidden="true">
+      <div class="glass transaction-modal" style="border-radius:32px 32px 0 0;padding:10px 20px 28px;max-width:520px;width:100%">
+        <div class="modal-drag-handle"></div>
+        <div class="modal-head">
+          <div>
+            <div class="modal-title">هدف مالی جدید</div>
+            <div class="modal-subtitle">مثل خرید ماشین، سفر، لپ‌تاپ</div>
+          </div>
+          <button class="close-btn" type="button" id="closeAddGoalBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="field">
+          <label for="newGoalTitle">عنوان هدف</label>
+          <input class="input" type="text" id="newGoalTitle" placeholder="مثلاً خرید ماشین">
+        </div>
+        <div class="field">
+          <label for="newGoalTarget">مبلغ هدف (تومان)</label>
+          <input class="input" type="number" id="newGoalTarget" placeholder="۰">
+        </div>
+        <div class="field">
+          <label for="newGoalDeadline">تاریخ هدف (اختیاری)</label>
+          <input class="input" type="date" id="newGoalDeadline">
+        </div>
+        <button class="save-goal-btn secondary full-width-action" type="button" id="addGoalBtn" style="margin-top:4px">افزودن هدف</button>
+      </div>
+    </div>
+
+    <!-- ══ ADD LOAN MODAL ══ -->
+    <div class="modal-overlay" id="addLoanModal" aria-hidden="true">
+      <div class="glass transaction-modal" style="border-radius:32px 32px 0 0;padding:10px 20px 28px;max-width:520px;width:100%">
+        <div class="modal-drag-handle"></div>
+        <div class="modal-head">
+          <div>
+            <div class="modal-title">وام جدید</div>
+            <div class="modal-subtitle">پیگیری بازپرداخت وام یا قسط</div>
+          </div>
+          <button class="close-btn" type="button" id="closeAddLoanBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="field">
+          <label for="newLoanTitle">نام وام</label>
+          <input class="input" type="text" id="newLoanTitle" placeholder="مثلاً بانک ملت">
+        </div>
+        <div class="form-grid two">
+          <div class="field">
+            <label for="newLoanInstallment">مبلغ هر قسط (تومان)</label>
+            <input class="input" type="number" id="newLoanInstallment" placeholder="۰">
+          </div>
+          <div class="field">
+            <label for="newLoanTotal">تعداد اقساط کل</label>
+            <input class="input" type="number" id="newLoanTotal" placeholder="۰">
+          </div>
+        </div>
+        <div class="field">
+          <label for="newLoanPaid">قسط‌های پرداخت‌شده (اختیاری)</label>
+          <input class="input" type="number" id="newLoanPaid" min="0" placeholder="۰">
+        </div>
+        <button class="save-goal-btn secondary full-width-action" type="button" id="addLoanBtn" style="margin-top:4px">
+          <i class="fa-solid fa-plus" style="margin-left:6px"></i>افزودن وام
+        </button>
+      </div>
+    </div>
 
     <section class="page" id="aiPage" data-page="ai">
       <div class="page-title-wrap">
@@ -4081,12 +4244,15 @@
 
       <div class="price-desc-enter">
         <div class="field price-enter">
-          <label for="transactionAmount">مبلغ (تومان)</label>
-          <input class="input" type="number" id="transactionAmount">
+          <label for="transactionAmount">مبلغ</label>
+          <div class="amount-input-wrap">
+            <input class="input amount-hero-input" type="number" id="transactionAmount" placeholder="۰" inputmode="numeric">
+            <span class="amount-input-suffix">تومان</span>
+          </div>
         </div>
         <div class="field desc-enter">
-          <label for="transactionNote">توضیحات</label>
-          <textarea style="resize: none;" class="input" id="transactionNote" rows="1"></textarea>
+          <label for="transactionNote">توضیحات (اختیاری)</label>
+          <textarea style="resize: none;" class="input" id="transactionNote" rows="1" placeholder="مثلاً ناهار با دوستان"></textarea>
         </div>
       </div>
       <div class="ai-cat-suggestion" id="aiCatSuggestion">
@@ -4182,8 +4348,20 @@
         const lastKey  = localStorage.getItem(STORAGE_KEYS.lastSeenMonth) || todayKey;
         if (lastKey !== todayKey) {
           // Parse the lastKey to archive that month
-          const [ly, lm] = lastKey.split('_').map(Number);
-          if (ly && lm) archiveCurrentMonth(ly, lm);
+          let [ly, lm] = lastKey.split('_').map(Number);
+          if (ly && lm) {
+            // Archive every month from lastKey up to (but not including) today —
+            // not just the single previous month — so that if the app wasn't
+            // opened for 2+ months, the in-between months get archived instead
+            // of being silently dropped when live transactions are filtered below.
+            let guard = 0;
+            while (jalaliMonthKey(ly, lm) !== todayKey && guard < 600) {
+              archiveCurrentMonth(ly, lm);
+              lm++;
+              if (lm > 12) { lm = 1; ly++; }
+              guard++;
+            }
+          }
           // Update the live transactions: keep only current-month ones
           // (older ones already archived; future ones wouldn't exist)
           const { jy, jm } = getJalaliDateParts(new Date());
@@ -4528,19 +4706,31 @@ const presetAvatars = [
 
       function getPeakExpenseDay(expenses, referenceDate = new Date()) {
         if (!Array.isArray(expenses) || !expenses.length) return null;
+        // Group by the transaction's actual calendar day (not just day-of-month),
+        // since the input list is already scoped to the desired month by the
+        // caller — re-filtering here by Gregorian month/year was buggy because a
+        // single Jalali month usually spans two different Gregorian months,
+        // which silently excluded part of the month and could even produce a
+        // fabricated date (today's month/year + a day number from another month).
         const totals = new Map();
 
         expenses.forEach(t => {
           const date = new Date(t.createdAt || Date.now());
-          if (date.getFullYear() !== referenceDate.getFullYear() || date.getMonth() !== referenceDate.getMonth()) return;
-          const day = date.getDate();
-          totals.set(day, (totals.get(day) || 0) + Number(t.amount || 0));
+          const dayKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+          const entry = totals.get(dayKey);
+          if (entry) {
+            entry.amount += Number(t.amount || 0);
+          } else {
+            totals.set(dayKey, { amount: Number(t.amount || 0), date });
+          }
         });
 
-        const peak = Array.from(totals.entries()).sort((a, b) => b[1] - a[1])[0];
+        let peak = null;
+        totals.forEach(entry => {
+          if (!peak || entry.amount > peak.amount) peak = entry;
+        });
         if (!peak) return null;
-        const [day, amount] = peak;
-        return { day, amount, date: new Date(referenceDate.getFullYear(), referenceDate.getMonth(), day) };
+        return { day: peak.date.getDate(), amount: peak.amount, date: peak.date };
       }
 
       function buildFinancialSnapshot(now = new Date()) {
@@ -5033,9 +5223,9 @@ function parseMoneyInput(value) {
           return;
         }
         els.transactionCategoryGrid.innerHTML = categories.map(cat => `
-          <button class="category-btn ${state.transactionCategory === cat.key ? 'active' : ''}" type="button" data-category="${cat.key}" style="border-color:${cat.color}33">
-            <span class="dot" style="background:${cat.color}"></span>
-            <span>${cat.emoji} ${cat.name}</span>
+          <button class="category-btn ${state.transactionCategory === cat.key ? 'active' : ''}" type="button" data-category="${cat.key}" style="--cat-color:${cat.color}">
+            <span class="cat-emoji-badge">${cat.emoji}</span>
+            <span class="cat-name">${cat.name}</span>
           </button>
         `).join('');
       }
@@ -5144,6 +5334,7 @@ function parseMoneyInput(value) {
               </div>
               <div class="transaction-right">
                 <div class="transaction-amount" style="color:${t.type === 'income' ? 'var(--good)' : 'var(--bad)'}">${sign}${formatMoney(t.amount)}</div>
+                ${isViewingArchive() ? '' : `
                 <div class="transaction-actions">
                   <button class="edit-btn" type="button" data-edit-transaction="${t.id}" aria-label="ویرایش">
                     <i class="fa-solid fa-pen-to-square"></i>
@@ -5151,7 +5342,7 @@ function parseMoneyInput(value) {
                   <button class="delete-btn" type="button" data-delete-transaction="${t.id}" aria-label="delete transaction">
                     <i class="fa-solid fa-trash"></i>
                   </button>
-                </div>
+                </div>`}
               </div>
             </div>
           `;
@@ -6341,7 +6532,7 @@ function parseMoneyInput(value) {
           <div class="donut-legend-item" data-slice="${i}">
             <span class="donut-legend-dot" style="background:${sl.color}"></span>
             <span class="donut-legend-name">${sl.name || sl.key}</span>
-            <span class="donut-legend-pct">${Math.round(sl.pct*100)}٪</span>
+            <span class="donut-legend-pct">${toPersianNumber(Math.round(sl.pct*100))}٪</span>
             <span class="donut-legend-amt">${formatMoneyCompact(sl.amount)}</span>
           </div>`
         ).join('');
@@ -6497,10 +6688,10 @@ function parseMoneyInput(value) {
 
       function renderCategoryManager() {
         els.categoryList.innerHTML = state.categories.map(cat => `
-          <span class="chip" style="border-color:${cat.color}33">
+          <span class="chip" style="--chip-color:${cat.color}">
             <span class="dot" style="background:${cat.color}"></span>
             <span>${cat.emoji} ${cat.name}</span>
-            <small>• ${cat.type === 'income' ? 'درآمد' : 'هزینه'}</small>
+            <small>${cat.type === 'income' ? 'درآمد' : 'هزینه'}</small>
             ${cat.builtin ? '' : `<button type="button" data-remove-category="${cat.key}" aria-label="remove category"><i class="fa-solid fa-xmark"></i></button>`}
           </span>
         `).join('');
@@ -6883,10 +7074,16 @@ function renderCalendarView() {
 
         const snapshot = buildFinancialSnapshot(new Date());
         const currentTopCat = snapshot.currentTop.category;
-        const prevTopAmount = snapshot.prevTop.amount || 0;
+        const currentTopKey = snapshot.currentTop.key;
         const currentTopAmount = snapshot.currentTop.amount || 0;
-        const topChangePct = prevTopAmount > 0
-          ? ((currentTopAmount - prevTopAmount) / prevTopAmount) * 100
+        // Compare the SAME category month-over-month (not "this month's top
+        // category" vs "last month's top category", which could be two
+        // different categories and would make the percentage meaningless).
+        const prevAmountSameCategory = currentTopKey
+          ? sumTransactions(snapshot.prevExpenses.filter(t => t.category === currentTopKey))
+          : 0;
+        const topChangePct = prevAmountSameCategory > 0
+          ? ((currentTopAmount - prevAmountSameCategory) / prevAmountSameCategory) * 100
           : (currentTopAmount > 0 ? 100 : 0);
 
         const insights = [];
@@ -7173,21 +7370,57 @@ function renderCalendarView() {
         document.getElementById('newLoanPaid').value = '';
       }
 
+      // Creates a real expense transaction for one loan installment payment.
+      // Called only when paidInstallments is incremented (پرداخت بعدی / +).
+      // Category defaults to the built-in 'سایر' (other) category as requested;
+      // falls back gracefully if that key is somehow missing.
+      function recordLoanInstallmentTransaction(loan) {
+        const amount = Math.max(0, Number(loan.installmentAmount || 0));
+        if (!amount) return;
+        const category = categoryByKey('other') ? 'other' : fallbackCategoryKey('expense');
+        state.transactions.unshift({
+          id: uid(),
+          amount,
+          note: `قسط وام: ${loan.title}`,
+          category,
+          type: 'expense',
+          createdAt: Date.now()
+        });
+        persistTransactions();
+      }
+
       function loanAction(type, loanId) {
         const loan = state.loans.find(l => l.id === loanId);
         if (!loan) return;
+        let transactionAdded = false;
         if (type === 'inc') {
-          if (loan.paidInstallments < loan.totalInstallments) loan.paidInstallments++;
+          if (loan.paidInstallments < loan.totalInstallments) {
+            loan.paidInstallments++;
+            recordLoanInstallmentTransaction(loan);
+            transactionAdded = true;
+          }
         } else if (type === 'dec') {
           if (loan.paidInstallments > 0) loan.paidInstallments--;
+          // Intentional: previously recorded installment transactions must stay
+          // untouched when the counter is decremented.
         } else if (type === 'pay') {
-          if (loan.paidInstallments < loan.totalInstallments) loan.paidInstallments++;
+          if (loan.paidInstallments < loan.totalInstallments) {
+            loan.paidInstallments++;
+            recordLoanInstallmentTransaction(loan);
+            transactionAdded = true;
+          }
         } else if (type === 'delete') {
-          if (!confirm(`وام «${loan.title}» حذف شود؟`)) return;
           state.loans = state.loans.filter(l => l.id !== loanId);
+          // Intentional: transactions already recorded for this loan's past
+          // installments remain in the transaction list.
         }
         persistLoans();
-        renderLoans();
+        if (transactionAdded) {
+          // A new transaction affects totals/analytics/budgets elsewhere too.
+          renderAll();
+        } else {
+          renderLoans();
+        }
       }
 
       function openLoanEdit(loanId) {
@@ -7234,6 +7467,108 @@ function renderCalendarView() {
         persistLoans();
         renderLoans();
         closeLoanEdit();
+      }
+
+      function openAddCategoryModal() {
+        const modal = document.getElementById('addCategoryModal');
+        if (!modal) return;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeAddCategoryModal() {
+        const modal = document.getElementById('addCategoryModal');
+        if (!modal) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+
+      function openAddGoalModal() {
+        const modal = document.getElementById('addGoalModal');
+        if (!modal) return;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeAddGoalModal() {
+        const modal = document.getElementById('addGoalModal');
+        if (!modal) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+
+      function openAddLoanModal() {
+        const modal = document.getElementById('addLoanModal');
+        if (!modal) return;
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeAddLoanModal() {
+        const modal = document.getElementById('addLoanModal');
+        if (!modal) return;
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+
+      // Wires the small "+" triggers (added during the restyle) that open the
+      // goal/loan popup forms. Purely additive: it never touches addGoal(),
+      // addLoan(), or their existing listeners — it only shows/hides the
+      // modal shell wrapped around those same inputs/buttons, and closes it
+      // automatically once the corresponding list actually grew (so a
+      // validation alert from addGoal()/addLoan() is never hidden behind a
+      // closing modal).
+      function wireAddEntityModals() {
+        const openCategoryBtn  = document.getElementById('openAddCategoryBtn');
+        const closeCategoryBtn = document.getElementById('closeAddCategoryBtn');
+        const categoryModal    = document.getElementById('addCategoryModal');
+        if (openCategoryBtn)  openCategoryBtn.addEventListener('click', openAddCategoryModal);
+        if (closeCategoryBtn) closeCategoryBtn.addEventListener('click', closeAddCategoryModal);
+        if (categoryModal) categoryModal.addEventListener('click', e => { if (e.target === categoryModal) closeAddCategoryModal(); });
+
+        const openGoalBtn  = document.getElementById('openAddGoalBtn');
+        const closeGoalBtn = document.getElementById('closeAddGoalBtn');
+        const goalModal    = document.getElementById('addGoalModal');
+        if (openGoalBtn)  openGoalBtn.addEventListener('click', openAddGoalModal);
+        if (closeGoalBtn) closeGoalBtn.addEventListener('click', closeAddGoalModal);
+        if (goalModal) goalModal.addEventListener('click', e => { if (e.target === goalModal) closeAddGoalModal(); });
+
+        const openLoanBtn  = document.getElementById('openAddLoanBtn');
+        const closeLoanBtn = document.getElementById('closeAddLoanBtn');
+        const loanModal    = document.getElementById('addLoanModal');
+        if (openLoanBtn)  openLoanBtn.addEventListener('click', openAddLoanModal);
+        if (closeLoanBtn) closeLoanBtn.addEventListener('click', closeAddLoanModal);
+        if (loanModal) loanModal.addEventListener('click', e => { if (e.target === loanModal) closeAddLoanModal(); });
+
+        let categoriesCountBeforeAdd = null;
+        document.addEventListener('click', e => {
+          if (e.target.closest('#addCategoryBtn')) categoriesCountBeforeAdd = state.categories.length;
+        }, true);
+        document.addEventListener('click', e => {
+          if (e.target.closest('#addCategoryBtn') && categoriesCountBeforeAdd !== null && state.categories.length > categoriesCountBeforeAdd) {
+            closeAddCategoryModal();
+          }
+        });
+
+        let goalsCountBeforeAdd = null;
+        document.addEventListener('click', e => {
+          if (e.target.closest('#addGoalBtn')) goalsCountBeforeAdd = state.goals.length;
+        }, true);
+        document.addEventListener('click', e => {
+          if (e.target.closest('#addGoalBtn') && goalsCountBeforeAdd !== null && state.goals.length > goalsCountBeforeAdd) {
+            closeAddGoalModal();
+          }
+        });
+
+        let loansCountBeforeAdd = null;
+        document.addEventListener('click', e => {
+          if (e.target.closest('#addLoanBtn')) loansCountBeforeAdd = state.loans.length;
+        }, true);
+        document.addEventListener('click', e => {
+          if (e.target.closest('#addLoanBtn') && loansCountBeforeAdd !== null && state.loans.length > loansCountBeforeAdd) {
+            closeAddLoanModal();
+          }
+        });
       }
 
       function wireLoanEvents() {
@@ -7493,9 +7828,9 @@ function renderCalendarView() {
       }
 
       function hardResetData() {
-        try {
-          localStorage.clear();
-        } catch (e) {}
+        // Only clear Finora's own storage keys — do NOT call localStorage.clear(),
+        // since that would also wipe the Supabase auth session key and log the
+        // user out unexpectedly right after a simple data reset.
         removeAllAppStorage();
 
         state.theme = 'dark';
@@ -8088,7 +8423,7 @@ function renderCalendarView() {
         const budgetPct  = budgetBase>0 ? (budgetUsed/budgetBase)*100 : 0;
         if (budgetBase>0) chips.push({
           type:budgetPct>=80?'warn':'good', icon:budgetPct>=80?'fa-triangle-exclamation':'fa-wallet',
-          title:'بودجه ماه', sub: Math.round(budgetPct)+'٪ مصرف · باقیمانده: '+formatMoneyCompact(budgetBase-budgetUsed)
+          title:'بودجه ماه', sub: toPersianNumber(Math.round(budgetPct))+'٪ مصرف · باقیمانده: '+formatMoneyCompact(budgetBase-budgetUsed)
         });
         if (snap.projectedExpense>0) chips.push({
           type:'good', icon:'fa-chart-line', title:'پیش‌بینی',
@@ -8146,6 +8481,7 @@ function renderCalendarView() {
           setupEventHandlers();
           setupArchiveEvents();
           wireLoanEvents();
+          wireAddEntityModals();
         }
 
         ensurePageConsistency();
@@ -8317,11 +8653,23 @@ function renderCalendarView() {
 
         await loadFromSupabase();
 
-        if (!bootCalled) {
-          bootCalled = true;
-          if (typeof window.boot === 'function') window.boot();
-        } else if (typeof window.reloadStateAndRender === 'function') {
-          window.reloadStateAndRender();
+        // loadState() (called inside boot()/reloadStateAndRender()) re-persists
+        // the normalized state back to localStorage. Without keeping isLoading
+        // true here, that re-persist passes through the setItem hook below and
+        // schedules a brand-new save to Supabase — which on a second device can
+        // trigger another realtime pull, which reloads and saves again, and so
+        // on (a self-inflicted sync ping-pong loop). Guarding this call closes
+        // that loop.
+        isLoading = true;
+        try {
+          if (!bootCalled) {
+            bootCalled = true;
+            if (typeof window.boot === 'function') window.boot();
+          } else if (typeof window.reloadStateAndRender === 'function') {
+            window.reloadStateAndRender();
+          }
+        } finally {
+          isLoading = false;
         }
 
         startRealtime();
@@ -8473,10 +8821,18 @@ function renderCalendarView() {
       pullDebounce = setTimeout(async () => {
         showSync('syncing', '🔄 دستگاه دیگری داده را تغییر داد...');
         await loadFromSupabase();
-        if (typeof window.reloadStateAndRender === 'function') {
-          window.reloadStateAndRender();
-        } else if (typeof window.renderAll === 'function') {
-          window.renderAll();
+        // Same reasoning as in handleSession(): keep isLoading true while the
+        // reload/render runs so its internal re-persist doesn't schedule a
+        // needless (and loop-prone) save right back to Supabase.
+        isLoading = true;
+        try {
+          if (typeof window.reloadStateAndRender === 'function') {
+            window.reloadStateAndRender();
+          } else if (typeof window.renderAll === 'function') {
+            window.renderAll();
+          }
+        } finally {
+          isLoading = false;
         }
         showSync('saved', '✅ همگام‌سازی شد');
       }, 500);
