@@ -436,6 +436,9 @@
       
     }
 
+
+    #openAddGoalBtn span,#openAddCategoryBtn span,#openAddLoanBtn span {color:white}
+
     .section-head h3,.page-title{font-size:1.15rem}
     .section-head span,.section-head p{color:var(--muted);font-size:.9rem}
 
@@ -3210,6 +3213,10 @@
       background:rgba(255,184,77,.14);
       color:var(--warn);
       border:1px solid rgba(255,184,77,.22);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 120px;
     }
     .loan-status-badge.done{
       background:rgba(24,230,166,.14);
@@ -3273,7 +3280,7 @@
       content:'';
       position:absolute;
       inset:0;
-      background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);
+      background:linear-gradient(90deg,transparent,rgba(255, 255, 255, 0.600),transparent);
       animation:shimmer 2.2s ease-in-out infinite;
     }
     @keyframes shimmer{
@@ -3314,7 +3321,7 @@
     /* ── action row ── */
     .loan-action-row{
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       gap:8px;
       align-items:center;
@@ -3345,26 +3352,46 @@
       padding:10px 6px;
       border-radius:14px;
       border:none; cursor:pointer;
-      font-size:10px; font-weight:700;
+      font-size:15px; font-weight:700;
       color:#fff;
       transition:.18s ease;
       /* white-space:nowrap; */
-      width: 50%;
+      width: 40%;
     }
 
     @media screen and (min-width:356px) and (max-width:380px) {
       .loan-pay-next-btn{
         font-size: 10px;
+              width: 50%;
       }
       
     }
 
-    @media screen and (min-width:380px) and (max-width:400px) {
+    @media screen and (min-width:380px) and (max-width:410px) {
       .loan-pay-next-btn{
         font-size: 12px;
+                      width: 50%;
       }
       
     }
+
+     @media screen and (min-width:410px) and (max-width:460px) {
+      .loan-pay-next-btn{
+        font-size: 12.5px;
+        width: 45%;
+      }
+      
+    }
+
+    @media screen and (min-width:460px) and (max-width:480px) {
+      .loan-pay-next-btn{
+        font-size: 14px;
+        width: 45%;
+      }
+      
+    }
+
+ 
     .loan-pay-next-btn:hover{ transform:translateY(-1px); box-shadow:0 8px 20px rgba(106,92,255,.3); }
     .loan-pay-next-btn:disabled{ opacity:.35; pointer-events:none; }
 
